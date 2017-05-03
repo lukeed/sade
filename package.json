@@ -1,0 +1,15 @@
+{
+  "name": "sade",
+  "version": "0.0.0",
+  "description": "Smooth CLI operator",
+  "license": "MIT",
+  "repository": "lukeed/sade",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "lukeed.com"
+  },
+  "dependencies": {
+    "mri": "^0.1.0"
+  }
+}
