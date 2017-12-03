@@ -110,3 +110,5 @@ class Sade {
 		// TODO: append remaining `opts:options` to arr
 	}
 }
+
+module.exports = str => new Sade(str);
