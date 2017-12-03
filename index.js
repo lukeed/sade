@@ -36,10 +36,12 @@ class Sade {
 		let config = { alias:{}, default:{} };
 		this.tree[cmd] = { usage, options:[], config, examples:[] };
 		desc && this.describe(desc);
+		return this;
 	}
 
 	describe(str) {
 		this.tree[ this.curr ].describe = Array.isArray(str) ? str : bySentences(str);
+		return this;
 	}
 
 	option(str, desc, val) {
@@ -63,18 +65,22 @@ class Sade {
 		}
 
 		cmd.options.push(arr);
+		return this;
 	}
 
 	action(handler) {
 		this.tree[ this.curr ].handler = handler;
+		return this;
 	}
 
 	example(str) {
 		this.tree[ this.curr ].examples.push(str);
+		return this;
 	}
 
 	version(str) {
 		this.version = str;
+		return this;
 	}
 
 	parse(arr) {
