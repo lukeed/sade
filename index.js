@@ -7,8 +7,8 @@ const parseFlags = str => (str || '').replace(/-{1,2}/g, '').split(/,?\s+/);
 class Sade {
 	constructor(name) {
 		this.name = name;
+		this.ver = '0.0.0';
 		this.curr = '__all__';
-		this.version = '0.0.0';
 		this.tree = {
 			__all__: {
 				options: [
@@ -79,7 +79,7 @@ class Sade {
 	}
 
 	version(str) {
-		this.version = str;
+		this.ver = str;
 		return this;
 	}
 
@@ -95,7 +95,7 @@ class Sade {
 		}
 
 		if (argv.version) {
-			return console.log(`${this.name}, ${this.version}`);
+			return console.log(`${this.name}, ${this.ver}`);
 		}
 
 		if (argv.help) {
