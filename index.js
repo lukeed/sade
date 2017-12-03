@@ -108,6 +108,7 @@ class Sade {
 		// TODO: parse arguments (`_`)
 		// TODO: push to new `arguments` arr per known key
 		// TODO: append remaining `opts:options` to arr
+		return cmd.handler(opts);
 	}
 }
 
