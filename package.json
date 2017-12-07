@@ -10,6 +10,7 @@
     "url": "lukeed.com"
   },
   "dependencies": {
-    "mri": "^1.1.0"
+    "mri": "^1.1.0",
+    "pad-right": "^0.2.2"
   }
 }
