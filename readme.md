@@ -81,7 +81,7 @@ sade('foo')
 Type: `String`<br>
 Default: `''`
 
-The Command's description. The value is passed directly to [`prog.describe`](progdescribestr).
+The Command's description. The value is passed directly to [`prog.describe`](#progdescribetext).
 
 #### opts
 
