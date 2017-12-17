@@ -2,6 +2,10 @@
 
 > Smooth (CLI) Operator 🎶
 
+Sade is a small but powerful tool for building command-line interface (CLI) applications for Node.js that are fast, responsive, and helpful!
+
+It enables default commands, option flags with aliases, default option values with type-casting, and automated help text generation! Your app's UX will be as smooth as butter... just like [Sade's voice](https://www.youtube.com/watch?v=4TYv2PhG89A). 😉
+
 
 ## Install
 
@@ -11,6 +15,8 @@ $ npm install --save sade
 
 
 ## Usage
+
+***Input:***
 
 ```js
 const sade = require('sade');
@@ -24,15 +30,57 @@ prog
 
 prog
   .command('build <src> <dest>')
-  .describe('Build the source directory')
+  .describe('Build the source directory. Expects an `index.js` entry file.')
   .option('-o, --output', 'Change the name of the output file', 'bundle.js')
+  .example('build src build --global --config my-conf.js')
+  .example('build app public -o main.js')
   .action((src, dest, opts) => {
-    console.log('> this is my src:', src);
-    console.log('> this is my dest:', dest);
+    console.log(`> building from ${src} to ${dest}`);
     console.log('> these are extra opts', opts);
   });
 
 prog.parse(process.argv);
+```
+
+***Output:***
+
+```a
+$ my-cli --help
+
+  Usage
+    $ my-cli <command> [options]
+
+  Available Commands
+    build    Build the source directory.
+
+  For more info, run any command with the `--help` flag
+    $ my-cli build --help
+
+  Options
+    -v, --version    Displays current version
+    -g, --global     An example global flag
+    -c, --config     Provide path to custom config  (default foo.config.js)
+    -h, --help       Displays this message
+
+
+$ my-cli build --help
+
+  Description
+    Build the source directory.
+    Expects an `index.js` entry file.
+
+  Usage
+    $ my-cli <src> [options]
+
+  Options
+    -o, --output    Change the name of the output file  (default bundle.js)
+    -g, --global    An example global flag
+    -c, --config    Provide path to custom config  (default foo.config.js)
+    -h, --help      Displays this message
+
+  Examples
+    $ my-cli build src build --global --config my-conf.js
+    $ my-cli build app public -o main.js
 ```
 
 ## Tips
