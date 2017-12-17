@@ -1,9 +1,13 @@
 {
   "name": "sade",
   "version": "0.0.0",
-  "description": "Smooth CLI operator",
+  "description": "Smooth (CLI) operator 🎶",
   "repository": "lukeed/sade",
+  "main": "lib/index.js",
   "license": "MIT",
+  "files": [
+    "lib"
+  ],
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
@@ -14,6 +18,6 @@
     "pad-right": "^0.2.2"
   },
   "engines": {
-    "node": "> 6"
+    "node": ">= 6"
   }
 }
