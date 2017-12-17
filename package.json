@@ -12,5 +12,8 @@
   "dependencies": {
     "mri": "^1.1.0",
     "pad-right": "^0.2.2"
+  },
+  "engines": {
+    "node": "> 6"
   }
 }
