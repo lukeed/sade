@@ -70,7 +70,7 @@ $ my-cli build --help
     Expects an `index.js` entry file.
 
   Usage
-    $ my-cli <src> [options]
+    $ my-cli build <src> [options]
 
   Options
     -o, --output    Change the name of the output file  (default bundle.js)
