@@ -176,6 +176,8 @@ Type: `String`
 
 The example string to add. This will be included in the general or command-specific `--help` output.
 
+> **Note:** Your example's `str` will be prefixed with your Programs's [`name`](#name).
+
 
 ### prog.option(flags, desc, value)
 
