@@ -2,8 +2,6 @@
 
 > Smooth (CLI) Operator 🎶
 
-See [Comparisons](#comparisons) for more info.
-
 
 ## Install
 
@@ -36,6 +34,21 @@ prog
 
 prog.parse(process.argv);
 ```
+
+## Tips
+
+- Define your global/program-wide version, options, description, and/or examples first.
+  _Once you define a Command, you can't access the global-scope again._
+
+- Don't worry about manually calling `.help()`~!
+  _Your help text is displayed automatically... including command-specific help text!_
+
+- Your usage patterns should only include required parameters.
+  _The `[options]` inclusion is appeneded for you automatically._
+
+- Only define what you want to display!
+  _Help text sections (example, options, etc) will only display if you provide values._
+
 
 ## API
 
@@ -176,7 +189,7 @@ The Option's flags, which may optionally include an alias.
 
 You may use a comma (`,`) or a space (` `) to separate the flags.
 
-> **Note:** The short & long flags can be declared in any order. However, the alias will always be displayed first in the `--help` output.
+> **Note:** The short & long flags can be declared in any order. However, the alias will always be displayed first.
 
 ```js
 prog.option('--global'); // no alias
