@@ -85,16 +85,16 @@ $ my-cli build --help
 
 ## Tips
 
-- Define your global/program-wide version, options, description, and/or examples first.
+- **Define your global/program-wide version, options, description, and/or examples first.**<br>
   _Once you define a Command, you can't access the global-scope again._
 
-- Don't worry about manually calling `.help()`~!
+- **Don't worry about manually displaying help~!**<br>
   _Your help text is displayed automatically... including command-specific help text!_
 
-- Your usage patterns should only include required parameters.
-  _The `[options]` inclusion is appeneded for you automatically._
+- **Your usage patterns should only include required parameters.**<br>
+  _The `[options]` inclusion is appended for you automatically._
 
-- Only define what you want to display!
+- **Only define what you want to display!**<br>
   _Help text sections (example, options, etc) will only display if you provide values._
 
 
