@@ -23,6 +23,15 @@
   "engines": {
     "node": ">= 6"
   },
+  "keywords": [
+    "cli",
+    "cli-app",
+    "commander",
+    "arguments",
+    "parser",
+    "yargs",
+    "argv"
+  ],
   "devDependencies": {
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0"
