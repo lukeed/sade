@@ -79,9 +79,6 @@ test('prog.command', t => {
 	isShapely(t, ctx.tree, 'bar');
 	t.is(bar.usage, 'bar', 'stores usage as is');
 
-	// Default
-	t.is(ctx.default, 'bar', 'makes first command the default');
-
 	// Options
 	t.is(bar.options.length, 0, 'has no options initially');
 	ctx.option('-f, --force', 'force');

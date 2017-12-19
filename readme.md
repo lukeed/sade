@@ -115,8 +115,6 @@ Create a new Command for your Program. This changes the current state of your Pr
 
 All configuration methods (`prog.describe`, `prog.action`, etc) will apply to this Command until another Command has been created!
 
-> **Important:** Unless updated elsewhere (via [`opts.default`](#optsdefault)), ***the first command defined is the Program's default command***.
-
 #### usage
 
 Type: `String`
@@ -158,9 +156,11 @@ Manually set/force the current Command to be the Program's default command. This
 ```js
 const prog = sade('greet');
 
-prog.command('hello'); //=> becomes default
+prog.command('hello');
+//=> only runs if :: `$ greet hello`
 
-prog.command('howdy', '', { default:true }); //=> is now the default
+prog.command('howdy', '', { default:true });
+//=> runs as `$ greet` OR `$ greet howdy`
 
 // $ greet
 //=> runs 'howdy' handler
