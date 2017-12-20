@@ -1,6 +1,6 @@
 {
   "name": "sade",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Smooth (CLI) operator 🎶",
   "repository": "lukeed/sade",
   "main": "lib/index.js",
