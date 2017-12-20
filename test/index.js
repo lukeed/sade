@@ -5,11 +5,8 @@ function isShapely(t, tree, key) {
 	t.is(typeof tree[key].usage, 'string', `~> tree[${key}].usage is a string`);
 	t.ok(Array.isArray(tree[key].options), `~> tree[${key}].options is an array`);
 	t.ok(Array.isArray(tree[key].examples), `~> tree[${key}].examples is an array`);
-	t.is(typeof tree[key].config, 'object', `~> tree[${key}].config is an object`);
-	t.ok(tree[key].config.alias, `~~> tree[${key}].config.alias exists`);
-	t.is(typeof tree[key].config.alias, 'object', `~~> tree[${key}].config.alias is an object`);
-	t.ok(tree[key].config.default, `~~> tree[${key}].config.default exists`);
-	t.is(typeof tree[key].config.default, 'object', `~~> tree[${key}].config.default is an object`);
+	t.is(typeof tree[key].default, 'object', `~> tree[${key}].default is an object`);
+	t.is(typeof tree[key].alias, 'object', `~> tree[${key}].alias is an object`);
 }
 
 test('sade', t => {
@@ -31,7 +28,7 @@ test('sade()', t => {
 		isShapely(t, ctx.tree, k);
 	}
 	let obj = ctx.tree.__default__;
-	t.deepEqual(obj.config.alias, { v:['version'] }, 'add `-v, --version` alias');
+	t.deepEqual(obj.alias, { v:['version'] }, 'add `-v, --version` alias');
 	t.deepEqual(obj.options[0], ['-v, --version', 'Displays current version'], 'add `-v, --version` flag');
 	t.end();
 });
@@ -83,7 +80,7 @@ test('prog.command', t => {
 	t.is(bar.options.length, 0, 'has no options initially');
 	ctx.option('-f, --force', 'force');
 	t.is(bar.options.length, 1, 'adds new Command option successfully');
-	t.deepEqual(bar.config.alias, { f:['force'] }, 'adds option flag & alias');
+	t.deepEqual(bar.alias, { f:['force'] }, 'adds option flag & alias');
 
 	// Examples
 	t.is(bar.examples.length, 0, 'has no examples initially');
