@@ -280,7 +280,7 @@ The new version number for your Program.
 
 > **Note:** Your Program `version` is `0.0.0` until you change it.
 
-### prog.parse(arr)
+### prog.parse(arr, opts)
 
 Parse a set of CLI arguments.
 
@@ -291,6 +291,36 @@ Type: `Array`
 Your Program's `process.argv` input.
 
 > **Important:** Do not `.slice(2)`! Doing so will break parsing~!
+
+#### opts
+
+Type: `Object`<br>
+Default: `{}`
+
+Additional `process.argv` parsing config. See [`mri`'s options](https://github.com/lukeed/mri#mriargs-options) for details.
+
+> **Important:** These values _override_ any internal values!
+
+```js
+prog
+  .command('hello')
+  .option('-f, --force', 'My flag');
+//=> currently has alias pair: f <--> force
+
+prog.parse(process.argv, {
+  alias: {
+    f: ['foo', 'fizz']
+  },
+  default: {
+    abc: 123
+  }
+});
+//=> ADDS alias pair: f <--> foo
+//=> REMOVES alias pair: f <--> force
+//=> ADDS alias pair: f <--> fizz
+//=> ADDS default: abc -> 123 (number)
+```
+
 
 ### prog.help(cmd)
 
