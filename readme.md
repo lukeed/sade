@@ -237,9 +237,11 @@ Type: `Function`
 
 The function to run when the current Command is executed.
 
-Its parameters are based on your [`usage`](#usage) definition.
+Its parameters are based (positionally) on your Command's [`usage`](#usage-1) definition.
 
 All options, flags, and extra/unknown values are included as the last parameter.
+
+> **Note:** Optional arguments are also passed as parameters & may be `undefined`!
 
 ```js
 sade('foo')
