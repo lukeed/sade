@@ -4,7 +4,9 @@
 
 Sade is a small but powerful tool for building command-line interface (CLI) applications for Node.js that are fast, responsive, and helpful!
 
-It enables default commands, option flags with aliases, default option values with type-casting, and automated help text generation! Your app's UX will be as smooth as butter... just like [Sade's voice](https://www.youtube.com/watch?v=4TYv2PhG89A). 😉
+It enables default commands, option flags with aliases, default option values with type-casting, required-vs-optional argument handling, command validation, and automated help text generation!
+
+Your app's UX will be as smooth as butter... just like [Sade's voice](https://www.youtube.com/watch?v=4TYv2PhG89A). 😉
 
 
 ## Install
@@ -88,11 +90,14 @@ $ my-cli build --help
 - **Define your global/program-wide version, options, description, and/or examples first.**<br>
   _Once you define a Command, you can't access the global-scope again._
 
+- **Required arguments without values will error & exit**<br>
+  _An `Insufficient arguments!` error will be displayed along with a help prompt._
+
 - **Don't worry about manually displaying help~!**<br>
   _Your help text is displayed automatically... including command-specific help text!_
 
-- **Your usage patterns should only include required parameters.**<br>
-  _The `[options]` inclusion is appended for you automatically._
+- **Automatic default/basic patterns**<br>
+  _Usage text will always append `[options]` & `--help` and `--version` are done for you._
 
 - **Only define what you want to display!**<br>
   _Help text sections (example, options, etc) will only display if you provide values._
@@ -121,17 +126,47 @@ Type: `String`
 
 The usage pattern for your current Command. This will be included in the general or command-specific `--help` output.
 
-You must wrap **required** parameter names with `<` and `>`; for example, `<foo>` and `<bar>`. These are ***positionally important***, which means they are passed to your current Command's [`handler`](#handler) function in the order that they were defined.
+_Required_ arguments are wrapped with `<` and `>` characters; for example, `<foo>` and `<bar>`.
+
+_Optional_ arguments are wrapped with `[` and `]` characters; for example, `[foo]` and `[bar]`.
+
+All arguments are ***positionally important***, which means they are passed to your current Command's [`handler`](#handler) function in the order that they were defined.
+
+When optional arguments are defined but don't receive a value, their positionally-equivalent function parameter will be `undefined`.
+
+> **Important:** You **must** define & expect required arguments _before_ optional arguments!
 
 ```js
 sade('foo')
+
   .command('greet <adjective> <noun>')
   .action((adjective, noun, opts) => {
     console.log(`Hello, ${adjective} ${noun}!`);
   })
 
-// $ foo greet beautiful person
-//=> Hello, beautiful person!
+  .command('drive <vehicle> [color] [speed]')
+  .action((vehicle, color, speed, opts) => {
+    let arr = ['Driving my'];
+    arr.push(color ? `${color} ${vehicle}` : vehicle);
+    speed && arr.push(`at ${speed}`);
+    opts.yolo && arr.push('...YOLO!!');
+    let str = arr.join(' ');
+    console.log(str);
+  });
+```
+
+```sh
+$ foo greet beautiful person
+# //=> Hello, beautiful person!
+
+$ foo drive car
+# //=> Driving my car
+
+$ foo drive car red
+# //=> Driving my red card
+
+$ foo drive car blue 100mph --yolo
+# //=> Driving my blue car at 100mph ...YOLO!!
 ```
 
 
@@ -153,17 +188,25 @@ Type: `Boolean`
 
 Manually set/force the current Command to be the Program's default command. This ensures that the current Command will run if no command was specified.
 
+> **Important:** If you run your Program without a Command _and_ without specifying a default command, your Program will exit with a `No command specified` error.
+
 ```js
 const prog = sade('greet');
 
 prog.command('hello');
 //=> only runs if :: `$ greet hello`
 
+// $ greet
+//=> error: No command specified.
+
 prog.command('howdy', '', { default:true });
 //=> runs as `$ greet` OR `$ greet howdy`
 
 // $ greet
 //=> runs 'howdy' handler
+
+// $ greet foobar
+//=> error: Invalid command
 ```
 
 
