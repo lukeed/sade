@@ -4,7 +4,7 @@
 
 Sade is a small but powerful tool for building command-line interface (CLI) applications for Node.js that are fast, responsive, and helpful!
 
-It enables default commands, option flags with aliases, default option values with type-casting, required-vs-optional argument handling, command validation, and automated help text generation!
+It enables default commands, git-like subcommands, option flags with aliases, default option values with type-casting, required-vs-optional argument handling, command validation, and automated help text generation!
 
 Your app's UX will be as smooth as butter... just like [Sade's voice](https://www.youtube.com/watch?v=4TYv2PhG89A). 😉
 
@@ -90,6 +90,9 @@ $ my-cli build --help
 - **Define your global/program-wide version, options, description, and/or examples first.**<br>
   _Once you define a Command, you can't access the global-scope again._
 
+- **Define all commands & options in the order that you want them to appear.**<br>
+  _Sade will not mutate or sort your CLI for you. Global options print before local options._
+
 - **Required arguments without values will error & exit**<br>
   _An `Insufficient arguments!` error will be displayed along with a help prompt._
 
@@ -101,6 +104,39 @@ $ my-cli build --help
 
 - **Only define what you want to display!**<br>
   _Help text sections (example, options, etc) will only display if you provide values._
+
+
+## Subcommands
+
+Subcommands are defined & parsed like any other command! When defining their [`usage`](#usage-1), everything up until the first argument (`[foo]` or `<foo>`) is interpreted as the command string.
+
+They should be defined in the order that you want them to appear in your general `--help` output.
+
+Lastly, it is _not_ necessary to define the subcommand's "base" as an additional command. However, if you choose to do so, it's recommended that you define it first for better visibility.
+
+```js
+const prog = sade('git');
+
+// Not necessary for subcommands to work, but it's here anyway!
+prog
+  .command('remote')
+  .describe('Manage set of tracked repositories')
+  .action(opts => {
+    console.log('~> Print current remotes...');
+  });
+
+prog
+  .command('remote add <name> <url>', 'Demo...')
+  .action((name, url, opts) => {
+    console.log(`~> Adding a new remote (${name}) to ${url}`);
+  });
+
+prog
+  .command('remote rename <old> <new>', 'Demo...')
+  .action((old, nxt, opts) => {
+    console.log(`~> Renaming from ${old} to ${nxt}~!`);
+  });
+```
 
 
 ## API
