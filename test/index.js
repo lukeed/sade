@@ -137,9 +137,9 @@ test('prog.command', t => {
 	t.end();
 });
 
-test('prog.action', t => {
-	t.plan(11);
-	let a='Bob', b, c, d;
+test.only('prog.action', t => {
+	t.plan(13);
+	let a='Bob', b, c, d, e;
 
 	let ctx = sade('foo')
 		.command('greet <name>')
@@ -150,7 +150,8 @@ test('prog.action', t => {
 			b && t.ok(opts.loud, '~> receives the `loud` flag (true) when parsed');
 			c && t.ok(opts['with-kiss'], '~> receives the `with-kiss` flag (true) when parsed :: preserves mid-hyphen');
 			d && t.is(opts['with-kiss'], 'cheek', '~> receives the `with-kiss` flag (`cheek`) when parsed :: preserves mid-hyphen');
-			b = c = d = false; // reset
+			e && t.is(opts['with-kiss'], false, '~> receive the `--no-with-kiss` flag (false) :: preserves mid-hyphen');
+			b = c = d = e = false; // reset
 		});
 
 	// Simulate `process.argv` entry
@@ -165,6 +166,7 @@ test('prog.action', t => {
 	(c=true) && run('--with-kiss'); // +2 tests
 	(d=true) && run('--with-kiss=cheek'); // +2 tests
 	(d=true) && run(['--with-kiss', 'cheek']); // +2 tests
+	(e=true) && run('--no-with-kiss'); // +2 tests
 });
 
 test('prog.action (multi requires)', t => {
