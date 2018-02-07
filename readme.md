@@ -329,6 +329,8 @@ You may use a comma (`,`) or a space (` `) to separate the flags.
 
 > **Note:** The short & long flags can be declared in any order. However, the alias will always be displayed first.
 
+> **Important:** If using hyphenated flag names, they will be accessible **as declared** within your [`action()`](#progactionhandler) handler!
+
 ```js
 prog.option('--global'); // no alias
 prog.option('-g, --global'); // alias first, comma
