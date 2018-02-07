@@ -49,9 +49,16 @@ test('prog.option (global)', t => {
 	t.ok(Array.isArray(item), 'options entry is also an array');
 	t.is(item.length, 3, 'entry has 3 segments (flags, desc, default)');
 	t.is(item[0], '-f, --foo', 'flips the flags order; alias is first');
-	ctx.option('-w, --with-hyphen');
-	let hyphenatedItem = arr[1];
-	t.is(hyphenatedItem[0], '-w, --with-hyphen', 'keeps inner hyphens intact');
+	t.end();
+});
+
+test('prog.option (hypenated)', t => {
+	let ctx = sade('foo');
+	ctx.option('--foo-bar, -f');
+	ctx.option('--foo-bar-baz');
+	let arr = ctx.tree.__all__.options;
+	t.is(arr[0][0], '-f, --foo-bar', 'keeps mid-hyphen; flips order so alias is first');
+	t.is(arr[1][0], '--foo-bar-baz', 'keeps all mid-hyphens');
 	t.end();
 });
 
@@ -131,26 +138,33 @@ test('prog.command', t => {
 });
 
 test('prog.action', t => {
-	t.plan(5);
-	let a='Bob', b=false;
+	t.plan(11);
+	let a='Bob', b, c, d;
 
 	let ctx = sade('foo')
 		.command('greet <name>')
 		.option('--loud', 'Be loud?')
+		.option('--with-kiss, -k', 'Super friendly?')
 		.action((name, opts) => {
 			t.is(name, a, '~> receives the required value as first parameter');
 			b && t.ok(opts.loud, '~> receives the `loud` flag (true) when parsed');
+			c && t.ok(opts['with-kiss'], '~> receives the `with-kiss` flag (true) when parsed :: preserves mid-hyphen');
+			d && t.is(opts['with-kiss'], 'cheek', '~> receives the `with-kiss` flag (`cheek`) when parsed :: preserves mid-hyphen');
+			b = c = d = false; // reset
 		});
 
 	// Simulate `process.argv` entry
-	let run = _ => ctx.parse(['', '', 'greet', a, b && '--loud']);
+	let run = args => ctx.parse(['', '', 'greet', a].concat(args || []));
 
 	let cmd = ctx.tree.greet;
 	t.ok(cmd.handler, 'added a `handler` key to the command leaf');
 	t.is(typeof cmd.handler, 'function', 'the `handler` is a function');
 
 	run(); // +1 test
-	(b=true) && run(); // +2 tests
+	(b=true) && run('--loud'); // +2 tests
+	(c=true) && run('--with-kiss'); // +2 tests
+	(d=true) && run('--with-kiss=cheek'); // +2 tests
+	(d=true) && run(['--with-kiss', 'cheek']); // +2 tests
 });
 
 test('prog.action (multi requires)', t => {
