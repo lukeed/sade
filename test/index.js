@@ -49,6 +49,9 @@ test('prog.option (global)', t => {
 	t.ok(Array.isArray(item), 'options entry is also an array');
 	t.is(item.length, 3, 'entry has 3 segments (flags, desc, default)');
 	t.is(item[0], '-f, --foo', 'flips the flags order; alias is first');
+	ctx.option('-w, --with-hyphen');
+	let hyphenatedItem = arr[1];
+	t.is(hyphenatedItem[0], '-w, --with-hyphen', 'keeps inner hyphens intact');
 	t.end();
 });
 
