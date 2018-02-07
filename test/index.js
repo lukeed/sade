@@ -137,7 +137,7 @@ test('prog.command', t => {
 	t.end();
 });
 
-test.only('prog.action', t => {
+test('prog.action', t => {
 	t.plan(13);
 	let a='Bob', b, c, d, e;
 
