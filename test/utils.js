@@ -13,7 +13,10 @@ test('utils.parse', t => {
 		['--foo, -f', ['foo', 'f']],
 		['--foo-bar, -f', ['foo-bar', 'f']],
 		['   -f ,    --foo  ', ['f', 'foo']],
-		['   --foo-bar  , -f  ', ['foo-bar', 'f']]
+		['   --foo-bar  , -f  ', ['foo-bar', 'f']],
+		['-f --foo', ['f', 'foo']],
+		['--foo -f', ['foo', 'f']],
+		['--foo-bar -f', ['foo-bar', 'f']],
 	].forEach(arr => {
 		t.same($.parse(arr[0]), arr[1], `(${arr[0]}) ~~> [${arr[1]}]`);
 	});
