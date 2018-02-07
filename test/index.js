@@ -52,6 +52,16 @@ test('prog.option (global)', t => {
 	t.end();
 });
 
+test('prog.option (hypenated)', t => {
+	let ctx = sade('foo');
+	ctx.option('--foo-bar, -f');
+	ctx.option('--foo-bar-baz');
+	let arr = ctx.tree.__all__.options;
+	t.is(arr[0][0], '-f, --foo-bar', 'keeps mid-hyphen; flips order so alias is first');
+	t.is(arr[1][0], '--foo-bar-baz', 'keeps all mid-hyphens');
+	t.end();
+});
+
 test('prog.describe (global)', t => {
 	let ctx = sade('foo').describe('Who is on first. What is on second.');
 	let arr = ctx.tree.__default__.describe;
@@ -128,26 +138,35 @@ test('prog.command', t => {
 });
 
 test('prog.action', t => {
-	t.plan(5);
-	let a='Bob', b=false;
+	t.plan(13);
+	let a='Bob', b, c, d, e;
 
 	let ctx = sade('foo')
 		.command('greet <name>')
 		.option('--loud', 'Be loud?')
+		.option('--with-kiss, -k', 'Super friendly?')
 		.action((name, opts) => {
 			t.is(name, a, '~> receives the required value as first parameter');
 			b && t.ok(opts.loud, '~> receives the `loud` flag (true) when parsed');
+			c && t.ok(opts['with-kiss'], '~> receives the `with-kiss` flag (true) when parsed :: preserves mid-hyphen');
+			d && t.is(opts['with-kiss'], 'cheek', '~> receives the `with-kiss` flag (`cheek`) when parsed :: preserves mid-hyphen');
+			e && t.is(opts['with-kiss'], false, '~> receive the `--no-with-kiss` flag (false) :: preserves mid-hyphen');
+			b = c = d = e = false; // reset
 		});
 
 	// Simulate `process.argv` entry
-	let run = _ => ctx.parse(['', '', 'greet', a, b && '--loud']);
+	let run = args => ctx.parse(['', '', 'greet', a].concat(args || []));
 
 	let cmd = ctx.tree.greet;
 	t.ok(cmd.handler, 'added a `handler` key to the command leaf');
 	t.is(typeof cmd.handler, 'function', 'the `handler` is a function');
 
 	run(); // +1 test
-	(b=true) && run(); // +2 tests
+	(b=true) && run('--loud'); // +2 tests
+	(c=true) && run('--with-kiss'); // +2 tests
+	(d=true) && run('--with-kiss=cheek'); // +2 tests
+	(d=true) && run(['--with-kiss', 'cheek']); // +2 tests
+	(e=true) && run('--no-with-kiss'); // +2 tests
 });
 
 test('prog.action (multi requires)', t => {
