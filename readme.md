@@ -21,6 +21,8 @@ $ npm install --save sade
 ***Input:***
 
 ```js
+#!/usr/bin/env node
+
 const sade = require('sade');
 
 const prog = sade('my-cli');
