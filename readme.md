@@ -413,6 +413,22 @@ prog.parse(process.argv, {
 //=> ADDS default: abc -> 123 (number)
 ```
 
+#### opts.lazy
+
+Type: `Boolean`<br>
+Default: `false`
+
+If true, Sade will not immediately execute the `action` handler. Instead, `parse()` will return an object of `{ name, args, handler }` shape, wherein the `name` is the command name, `args` is all arguments that _would be_ passed to the action handler, and `handler` is the function itself.
+
+From this, you may choose when to run the `handler` function. You also have the option to further modify the `args` for any reason, if needed.
+
+```js
+let { name, args, handler } = prog.parse(process.argv, { lazy:true });
+console.log('> Received command: ', name);
+
+// later on...
+handler.apply(null, args);
+```
 
 ### prog.help(cmd)
 
