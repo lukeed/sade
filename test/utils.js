@@ -1,4 +1,5 @@
 const test = require('tape');
+const sade = require('../lib');
 const $ = require('../lib/utils');
 
 test('utils.parse', t => {
@@ -33,5 +34,20 @@ test('utils.sentences', t => {
 	].forEach(arr => {
 		t.same($.sentences(arr[0]), arr[1], `(${arr[0]}) ~~> [${arr[1]}]`);
 	});
+	t.end();
+});
+
+test('utils.help', t => {
+	let { name, tree } = sade('foo').describe('global foo').command('bar', 'Hello. World.').command('fizz <buzz>');
+
+	let foo = $.help(name, tree, '__default__'); // global, 1 or 0 lines of desc per command
+	t.is(foo, '\n  Description\n    global foo\n\n  Usage\n    $ foo <command> [options]\n\n  Available Commands\n    bar     Hello.\n    fizz    \n\n  For more info, run any command with the `--help` flag\n    $ foo bar --help\n    $ foo fizz --help\n\n  Options\n    -v, --version    Displays current version\n    -h, --help       Displays this message\n');
+
+	let bar = $.help(name, tree, 'bar'); // two-line description
+	t.is(bar, '\n  Description\n    Hello.\n    World.\n\n  Usage\n    $ foo bar [options]\n\n  Options\n    -h, --help    Displays this message\n    -h, --help    Displays this message\n');
+
+	let fizz = $.help(name, tree, 'fizz'); // no description
+	t.is(fizz, '\n  Usage\n    $ foo fizz <buzz> [options]\n\n  Options\n    -h, --help    Displays this message\n    -h, --help    Displays this message\n    -h, --help    Displays this message\n');
+
 	t.end();
 });
