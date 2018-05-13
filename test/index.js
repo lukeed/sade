@@ -192,6 +192,29 @@ test('prog.action (multi requires)', t => {
 	(c=true) && run(); // +4 tests
 });
 
+test('prog.action (multi optional)', t => {
+	t.plan(7);
+
+	let a='aaa', b='bbb', c=false;
+
+	let ctx = sade('foo')
+		.command('build [src] [dest]')
+		.option('-f, --force', 'Force foo overwrite')
+		.action((src, dest, opts) => {
+			t.is(src, a, '~> receives `src` param first');
+			t.is(dest, b, '~> receives `dest` param second');
+			c && t.ok(opts.force, '~> receives the `force` flag (true) when parsed');
+			c && t.ok(opts.f, '~> receives the `f` alias (true) when parsed');
+		});
+
+	t.is(ctx.tree.build.usage, 'build [src] [dest]', 'writes all positional params to usage');
+
+	let run = _ => ctx.parse(['', '', 'build', a, b, c && '-f']);
+
+	run(); // +2 tests
+	(c=true) && run(); // +4 tests
+});
+
 test('parse lazy', t => {
 	t.plan(14);
 
