@@ -17,8 +17,7 @@
     "test": "tape test/*.js | tap-spec"
   },
   "dependencies": {
-    "mri": "^1.1.0",
-    "pad-right": "^0.2.2"
+    "mri": "^1.1.0"
   },
   "engines": {
     "node": ">= 6"
