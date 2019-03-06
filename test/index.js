@@ -248,3 +248,20 @@ test('parse lazy', t => {
 
 	bar.handler.apply(null, bar.args); // manual bcuz lazy; +2 tests
 });
+
+test('explicitly parse boolean and string', t => {
+	t.plan(3);
+	const ctx = sade('foo')
+		.setType({ boolean: ['boolean'], string: ['string', 'booleanString'] })
+		.command('test')
+		.option('--boolean', 'this should be Boolean', true)
+		.option('--string', 'this should be String', null)
+		.option('--booleanString', 'this should be String', true)
+		.action(opts => {
+			t.is(opts.boolean, false, '~> boolean should be Boolean');
+			t.is(opts.string, 'false', '~> string should be String');
+			t.is(opts.booleanString, 'false', '~> booleanString should be String');
+		})
+	const run = _ => ctx.parse(['', '', 'test', '--boolean=false', '--string=false', '--booleanString=false']);
+	run();
+})

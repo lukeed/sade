@@ -444,6 +444,28 @@ Default: `null`
 
 The name of the command for which to display help. Otherwise displays the general help.
 
+### prog.setType(opts)
+
+This allows you to set options' type explicitly. In fact, you can override the default type.
+
+#### opts
+
+Type: `Object`<br>
+Default: `{ string: [], boolean: [] }`
+
+For more details, checkout [mri API](registry=http://registry.npm.qiwoo.org) for `options.string` and `options.boolean` parts.
+
+```js
+prog
+  .setType({ boolean: ['flag1'] })
+  .command('test')
+  .option('--flag1', 'this is flag1', 'true')
+  .action(opts => {
+    console.log(typeof opts.flag1); // boolean
+  });
+
+prog.parse(['', '', 'test', '--flag1=false']);
+```
 
 ## License
 
