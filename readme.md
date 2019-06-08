@@ -413,6 +413,33 @@ prog.parse(process.argv, {
 //=> ADDS default: abc -> 123 (number)
 ```
 
+#### opts.unknown
+
+Type: `Function`<br>
+Default: `undefined`
+
+Callback to run when an unspecified option flag has been found. This is [passed directly to `mri`](https://github.com/lukeed/mri#optionsunknown).
+
+Your handler will receive the unknown flag (string) as its only argument.<br>
+You may return a string, which will be used as a custom error message. Otherwise, a default message is displayed.
+
+```js
+sade('sirv')
+  .command('start [dir]')
+  .parse(process.argv, {
+    unknown: arg => `Custom error message: ${arg}`
+  });
+
+/*
+$ sirv start --foobar
+
+  ERROR
+    Custom error message: --foobar
+
+  Run `$ sirv --help` for more info.
+*/
+```
+
 #### opts.lazy
 
 Type: `Boolean`<br>
