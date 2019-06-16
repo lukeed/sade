@@ -37,7 +37,7 @@ test('(usage) basic :: error :: invalid command', t => {
 	t.is(pid.status, 1, 'exits with error code');
 	t.is(
 		pid.stderr.toString(),
-		'\n  ERROR\n    Invalid command: foobar.\n\n  Run `$ bin --help` for more info.\n\n',
+		'\n  ERROR\n    Invalid command: foobar\n\n  Run `$ bin --help` for more info.\n\n',
 		'~> stderr has "Invalid command: foobar" error message'
 	);
 	t.is(pid.stdout.length, 0, '~> stdout is empty');
