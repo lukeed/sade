@@ -215,7 +215,7 @@ test('prog.action (multi optional)', t => {
 	(c=true) && run(); // +4 tests
 });
 
-test('parse lazy', t => {
+test('prog.parse :: lazy', t => {
 	t.plan(14);
 
 	let val='aaa', f=false;
@@ -238,6 +238,38 @@ test('parse lazy', t => {
 	t.ok(Array.isArray(foo.args[1]._), '~> ensures `opts._` is still `[]` at least');
 	t.is(typeof foo.handler, 'function', '~> returns the action handler');
 	t.is(foo.name, 'build', '~> returns the command name');
+
+	foo.handler.apply(null, foo.args); // must be manual bcuz lazy; +1 test
+
+	let bar = run(f=true);
+	t.is(bar.constructor, Object, 'returns an object');
+	t.is(bar.args[1].constructor, Object, '~> preserves the `opts` value last');
+	t.is(bar.args[1].force, true, '~> attaches the `force:true` option');
+
+	bar.handler.apply(null, bar.args); // manual bcuz lazy; +2 tests
+});
+
+test('prog.parse :: lazy :: single', t => {
+	t.plan(14);
+
+	let val='aaa', f=false;
+
+	let ctx = sade('foo <src>').option('--force').action((src, opts) => {
+		t.is(src, val, '~> receives `src` param first');
+		f && t.ok(opts.force, '~> receives the `force` flag (true) when parsed');
+	});
+
+	let run = _ => ctx.parse(['', '', val, f && '--force'], { lazy:true });
+
+	let foo = run();
+	t.is(foo.constructor, Object, 'returns an object');
+	t.same(Object.keys(foo), ['args', 'name', 'handler'], 'contains `args`,`name`,`handler` keys');
+	t.ok(Array.isArray(foo.args), '~> returns the array of arguments');
+	t.is(foo.args[0], val, '~> preserves the `src` value first');
+	t.is(foo.args[1].constructor, Object, '~> preserves the `opts` value last');
+	t.ok(Array.isArray(foo.args[1]._), '~> ensures `opts._` is still `[]` at least');
+	t.is(typeof foo.handler, 'function', '~> returns the action handler');
+	t.is(foo.name, '', '~> returns empty command name');
 
 	foo.handler.apply(null, foo.args); // must be manual bcuz lazy; +1 test
 
