@@ -376,6 +376,15 @@ test('(usage) single is catch all', t => {
 	t.end();
 });
 
+test('(usage) single :: command() throws', t => {
+	let pid = exec('single3.js', ['foo']);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	// throws an error in the process
+	t.true(pid.stderr.toString().includes('Error: Disable "single" mode to add commands'), '~> threw Error w/ message');
+	t.end();
+});
+
 test('(usage) single :: help', t => {
 	let pid1 = exec('single1.js', ['--help']);
 	t.is(pid1.status, 0, 'exits without error code');
