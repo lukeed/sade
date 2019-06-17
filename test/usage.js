@@ -362,6 +362,20 @@ test('(usage) single', t => {
 	t.end();
 });
 
+test('(usage) single is catch all', t => {
+	let pid1 = exec('single2.js', ['type']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), `~> ran "single" with: {"_":["type"]}\n`, '~> ran single command');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('single2.js', ['type', 'dir', '--global']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), `~> ran "single" with: {"_":["type","dir"],"global":true,"g":true}\n`, '~> ran single command');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
 test('(usage) single :: help', t => {
 	let pid1 = exec('single1.js', ['--help']);
 	t.is(pid1.status, 0, 'exits without error code');
