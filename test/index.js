@@ -17,7 +17,7 @@ test('sade', t => {
 test('sade()', t => {
 	let ctx = sade('foo');
 	t.ok(ctx.constructor && ctx.constructor.name === 'Sade', 'returns instance of Sade');
-	t.is(ctx.name, 'foo', 'sets Program name to `foo`');
+	t.is(ctx.bin, 'foo', 'sets Program name to `foo`');
 	t.is(ctx.ver, '0.0.0', 'defaults `ver` to `0.0.0`');
 	t.is(ctx.curr, '', 'is empty command-name scope');
 	t.is(ctx.default, '', 'has no default command (yet)');

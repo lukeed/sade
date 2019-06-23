@@ -38,24 +38,24 @@ test('utils.sentences', t => {
 });
 
 test('utils.help', t => {
-	let { name, tree } = sade('foo').describe('global foo').command('bar', 'Hello. World.').command('fizz <buzz>');
+	let { bin, tree } = sade('foo').describe('global foo').command('bar', 'Hello. World.').command('fizz <buzz>');
 
-	let foo = $.help(name, tree, '__default__'); // global, 1 or 0 lines of desc per command
+	let foo = $.help(bin, tree, '__default__'); // global, 1 or 0 lines of desc per command
 	t.is(foo, '\n  Description\n    global foo\n\n  Usage\n    $ foo <command> [options]\n\n  Available Commands\n    bar     Hello.\n    fizz    \n\n  For more info, run any command with the `--help` flag\n    $ foo bar --help\n    $ foo fizz --help\n\n  Options\n    -v, --version    Displays current version\n    -h, --help       Displays this message\n');
 
-	let bar = $.help(name, tree, 'bar'); // two-line description
+	let bar = $.help(bin, tree, 'bar'); // two-line description
 	t.is(bar, '\n  Description\n    Hello.\n    World.\n\n  Usage\n    $ foo bar [options]\n\n  Options\n    -h, --help    Displays this message\n');
 
-	let fizz = $.help(name, tree, 'fizz'); // no description
+	let fizz = $.help(bin, tree, 'fizz'); // no description
 	t.is(fizz, '\n  Usage\n    $ foo fizz <buzz> [options]\n\n  Options\n    -h, --help    Displays this message\n');
 
 	t.end();
 });
 
 test('utils.help :: single', t => {
-	let { name, tree } = sade('foo <bar> [baz]', true).describe('global foo').option('-p, --port', 'Custom port value', 8000);
+	let { bin, tree } = sade('foo <bar> [baz]', true).describe('global foo').option('-p, --port', 'Custom port value', 8000);
 
-	let text = $.help(name, tree, '__default__', true);
+	let text = $.help(bin, tree, '__default__', true);
 	t.is(text, '\n  Description\n    global foo\n\n  Usage\n    $ foo <bar> [baz] [options]\n\n  Options\n    -p, --port       Custom port value  (default 8000)\n    -v, --version    Displays current version\n    -h, --help       Displays this message\n');
 
 	t.end();
