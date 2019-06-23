@@ -333,4 +333,74 @@ test('(usage) default :: help', t => {
 	t.end();
 });
 
-// TODO: single command (NEW)
+
+
+test('(usage) single :: error :: missing argument', t => {
+	let pid = exec('single1.js', []);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	t.is(
+		pid.stderr.toString(),
+		'\n  ERROR\n    Insufficient arguments!\n\n  Run `$ bin --help` for more info.\n\n',
+		'~> stderr has "Insufficient arguments!" error message'
+	);
+
+	t.end();
+});
+
+test('(usage) single', t => {
+	let pid1 = exec('single1.js', ['type']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "single" w/ "type" and "~default~" values\n', '~> ran single command');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('single1.js', ['type', 'dir']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "single" w/ "type" and "dir" values\n', '~> ran single command');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) single is catch all', t => {
+	let pid1 = exec('single2.js', ['type']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), `~> ran "single" with: {"_":["type"]}\n`, '~> ran single command');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('single2.js', ['type', 'dir', '--global']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), `~> ran "single" with: {"_":["type","dir"],"global":true,"g":true}\n`, '~> ran single command');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) single :: command() throws', t => {
+	let pid = exec('single3.js', ['foo']);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	// throws an error in the process
+	t.true(pid.stderr.toString().includes('Error: Disable "single" mode to add commands'), '~> threw Error w/ message');
+	t.end();
+});
+
+test('(usage) single :: help', t => {
+	let pid1 = exec('single1.js', ['--help']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+	t.false(pid1.stdout.toString().includes('Available Commands'), '~> global help does NOT show "Available Commands" text');
+	t.false(pid1.stdout.toString().includes('run any command with the `--help` flag'), '~> global help does NOT show "run any command with the `--help` flag" text');
+
+	let pid2 = exec('single1.js', ['--help']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin <type> [dir] [options]'), '~> shows single-command help w/ "Usage" text');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	let pid3 = exec('single1.js', ['bar', '--help']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.true(pid3.stdout.toString().includes('Usage\n    $ bin <type> [dir] [options]'), '~> shows single-command help w/ "Usage" text');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
