@@ -27,9 +27,6 @@ test('sade()', t => {
 	for (k in ctx.tree) {
 		isShapely(t, ctx.tree, k);
 	}
-	let obj = ctx.tree.__default__;
-	t.deepEqual(obj.alias, { v:['version'] }, 'add `-v, --version` alias');
-	t.deepEqual(obj.options[0], ['-v, --version', 'Displays current version'], 'add `-v, --version` flag');
 	t.end();
 });
 
