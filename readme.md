@@ -141,16 +141,94 @@ prog
 ```
 
 
+## Single Command Mode
+
+In certain circumstances, you may only need `sade` for a single-command CLI application.
+
+> **Note:** Until `v1.6.0`, this made for an awkward pairing.
+
+To enable this, you may make use of the [`isSingle`](#issingle) argument. Doing so allows you to pass the program's entire [`usage` text](#usage-1) into the `name` argument.
+
+With "Single Command Mode" enabled, your entire binary operates as one command. This means that any [`prog.command`](#progcommandusage-desc-opts) calls are disallowed & will instead throw an Error. Of course, you may still define a program version, a description, an example or two, and declare options. You are customizing the program's attributes as a whole.<sup>*</sup>
+
+> <sup>*</sup> This is true for multi-command applications, too, up until your first `prog.command()` call!
+
+***Example***
+
+Let's reconstruct [`sirv-cli`](https://github.com/lukeed/sirv), which is a single-command application that (optionally) accepts a directory from which to serve files. It also offers a slew of option flags:
+
+```js
+sade('sirv [dir]', true)
+  .version('1.0.0')
+  .describe('Run a static file server')
+  .example('public -qeim 31536000')
+  .example('--port 8080 --etag')
+  .example('my-app --dev')
+  .option('-D, --dev', 'Enable "dev" mode')
+  .option('-e, --etag', 'Enable "Etag" header')
+  // There are a lot...
+  .option('-H, --host', 'Hostname to bind', 'localhost')
+  .option('-p, --port', 'Port to bind', 5000)
+  .action((dir, opts) => {
+    // Program handler
+  })
+  .parse(process.argv);
+```
+
+When `sirv --help` is run, the generated help text is trimmed, fully aware that there's only one command in this program:
+
+```
+  Description
+    Run a static file server
+
+  Usage
+    $ sirv [dir] [options]
+
+  Options
+    -D, --dev        Enable "dev" mode
+    -e, --etag       Enable "Etag" header
+    -H, --host       Hostname to bind  (default localhost)
+    -p, --port       Port to bind  (default 5000)
+    -v, --version    Displays current version
+    -h, --help       Displays this message
+
+  Examples
+    $ sirv public -qeim 31536000
+    $ sirv --port 8080 --etag
+    $ sirv my-app --dev
+```
+
+
+
 ## API
 
-### sade(name)
-
-#### name
-
-Type: `String`<br>
+### sade(name, isSingle)
 Returns: `Program`
 
-The name of your bin/program. Returns the `Program` itself, wherein all other methods are available.
+Returns your chainable Sade instance, aka your `Program`.
+
+#### name
+Type: `String`<br>
+Required: `true`
+
+The name of your `Program` / binary application.
+
+#### isSingle
+Type: `Boolean`<br>
+Default: `name.includes(' ');`
+
+If your `Program` is meant to have ***only one command***.<br>
+When `true`, this simplifies your generated `--help` output such that:
+
+* the "root-level help" is your _only_ help text
+* the "root-level help" does not display an `Available Commands` section
+* the "root-level help" does not inject `$ name <command>` into the `Usage` section
+* the "root-level help" does not display `For more info, run any command with the `--help` flag` text
+
+You may customize the `Usage` of your command by modifying the `name` argument directly.<br>
+Please read [Single Command Mode](#single-command-mode) for an example and more information.
+
+> **Important:** Whenever `name` includes a custom usage, then `isSingle` is automatically assumed and enforced!
 
 ### prog.command(usage, desc, opts)
 
