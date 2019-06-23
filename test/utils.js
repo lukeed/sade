@@ -51,3 +51,12 @@ test('utils.help', t => {
 
 	t.end();
 });
+
+test('utils.help :: single', t => {
+	let { name, tree } = sade('foo <bar> [baz]', true).describe('global foo').option('-p, --port', 'Custom port value', 8000);
+
+	let text = $.help(name, tree, '__default__', true);
+	t.is(text, '\n  Description\n    global foo\n\n  Usage\n    $ foo <bar> [baz] [options]\n\n  Options\n    -p, --port       Custom port value  (default 8000)\n    -v, --version    Displays current version\n    -h, --help       Displays this message\n');
+
+	t.end();
+});
