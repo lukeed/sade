@@ -237,6 +237,24 @@ test('(usage) unknown.custom', t => {
 	t.end();
 });
 
+test('(usage) unknown.plain', t => {
+	let pid1 = exec('unknown2.js', ['foo', '--flag1', '--flag2']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+	t.is(pid1.stdout.toString(), '~> ran "foo" with {"_":[],"flag1":true,"flag2":true}\n', '~> command invoked');
+
+	let pid2 = exec('unknown2.js', ['foo', '--flag3']);
+	t.is(pid2.status, 1, 'exits with error code');
+	t.is(pid2.stdout.length, 0, '~> stdout is empty');
+	t.is(
+		pid2.stderr.toString(),
+		'\n  ERROR\n    Custom error: --flag3\n\n  Run `$ bin --help` for more info.\n\n',
+		'~> stderr has "Custom error: --flag3" error message'
+	);
+
+	t.end();
+});
+
 
 
 test('(usage) subcommands', t => {
