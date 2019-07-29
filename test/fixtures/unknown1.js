@@ -2,6 +2,7 @@
 const sade = require('../../lib');
 
 sade('bin')
+	.option('--bool', 'flag defined')
 	.option('-g, --global', 'global flag')
 
 	.command('foo')
