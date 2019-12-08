@@ -198,6 +198,75 @@ When `sirv --help` is run, the generated help text is trimmed, fully aware that 
     $ sirv my-app --dev
 ```
 
+## Command Aliases
+
+Command aliases are alternative names (aliases) for a command. They are often used as shortcuts or as typo relief!
+
+The aliased names do not appear in the general help text.<br>
+Instead, they only appear within the Command-specific help text under an "Aliases" section.
+
+***Limitations***
+
+* You cannot assign aliases while in [Single Command Mode](#single-command-mode)
+* You cannot call [`prog.alias()`](#progaliasnames) before defining any Commands (via `prog.commmand()`)
+* You, the developer, must keep track of which aliases have already been used and/or exist as Command names
+
+***Example***
+
+Let's reconstruct the `npm install` command as a Sade program:
+
+```js
+sade('npm')
+  // ...
+  .command('install [package]', 'Install a package', {
+    alias: ['i', 'add', 'isntall']
+  })
+  .option('-P, --save-prod', 'Package will appear in your dependencies.')
+  .option('-D, --save-dev', 'Package will appear in your devDependencies.')
+  .option('-O, --save-optional', 'Package will appear in your optionalDependencies')
+  .option('-E, --save-exact', 'Save exact versions instead of using a semver range operator')
+  // ...
+```
+
+When we run `npm --help` we'll see this general help text:
+
+```
+  Usage
+    $ npm <command> [options]
+
+  Available Commands
+    install    Install a package
+
+  For more info, run any command with the `--help` flag
+    $ npm install --help
+
+  Options
+    -v, --version    Displays current version
+    -h, --help       Displays this message
+```
+
+When we run `npm install --help` &mdash; ***or*** the help flag with any of `install`'s aliases &mdash; we'll see this command-specific help text:
+
+```
+  Description
+    Install a package
+
+  Usage
+    $ npm install [package] [options]
+
+  Aliases
+    $ npm i
+    $ npm add
+    $ npm isntall
+
+  Options
+    -P, --save-prod        Package will appear in your dependencies.
+    -D, --save-dev         Package will appear in your devDependencies.
+    -O, --save-optional    Package will appear in your optionalDependencies
+    -E, --save-exact       Save exact versions instead of using a semver range operator
+    -h, --help             Displays this message
+```
+
 
 
 ## API
@@ -298,6 +367,26 @@ The Command's description. The value is passed directly to [`prog.describe`](#pr
 Type: `Object`<br>
 Default: `{}`
 
+##### opts.alias
+Type: `String|Array`
+
+Optionally define one or more aliases for the current Command.<br>
+When declared, the `opts.alias` value is passed _directly_ to the [`prog.alias`](#progaliasnames) method.
+
+```js
+// Program A is equivalent to Program B
+// ---
+
+const A = sade('bin')
+  .command('build', 'My build command', { alias: 'b' })
+  .command('watch', 'My watch command', { alias: ['w', 'dev'] });
+
+const B = sade('bin')
+  .command('build', 'My build command').alias('b')
+  .command('watch', 'My watch command').alias('w', 'dev');
+```
+
+
 ##### opts.default
 
 Type: `Boolean`
@@ -341,6 +430,34 @@ Internally, your description will be separated into an `Array` of sentences.
 For general `--help` output, ***only*** the first sentence will be displayed. However, **all sentences** will be printed for command-specific `--help` text.
 
 > **Note:** Pass an `Array` if you don't want internal assumptions. However, the first item is _always_ displayed in general help, so it's recommended to keep it short.
+
+
+### prog.alias(...names)
+
+Define one or more aliases for the current Command.
+
+> **Important:** An error will be thrown if:<br>1) the program is in [Single Command Mode](#single-command-mode); or<br>2) `prog.alias` is called before any `prog.command`.
+
+#### names
+
+Type: `String`
+
+The list of alternative names (aliases) for the current Command.<br>
+For example, you may want to define shortcuts and/or common typos for the Command's full name.
+
+> **Important:** Sade _does not_ check if the incoming `names` are already in use by other Commands or their aliases.<br>During conflicts, the Command with the same `name` is given priority, otherwise the first Command (according to Program order) with `name` as an alias is chosen.
+
+The `prog.alias()` is append-only, so calling it multiple times within a Command context will _keep_ all aliases, including those initially passed via [`opts.alias`](#optsdefault).
+
+```js
+sade('bin')
+  .command('hello <name>', 'Greet someone by their name', {
+    alias: ['hey', 'yo']
+  })
+  .alias('hi', 'howdy')
+  .alias('hola', 'oi');
+//=> hello aliases: hey, yo, hi, howdy, hola, oi
+```
 
 
 ### prog.action(handler)
@@ -392,7 +509,7 @@ Type: `String`
 
 The example string to add. This will be included in the general or command-specific `--help` output.
 
-> **Note:** Your example's `str` will be prefixed with your Programs's [`name`](#sadename).
+> **Note:** Your example's `str` will be prefixed with your Program's [`name`](#sadename).
 
 
 ### prog.option(flags, desc, value)
