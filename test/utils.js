@@ -60,3 +60,28 @@ test('utils.help :: single', t => {
 
 	t.end();
 });
+
+test('utils.help :: alias', t => {
+	let { bin, tree } = (
+		sade('bin')
+			.describe('program description')
+			.command('foo', 'Hello, foo!', { alias: 'f' })
+			.command('bar <fizz>', 'Heya, bar!', { alias: ['b', 'ba'] })
+			.command('baz <buzz>', 'Howdy, baz~!')
+			.alias('bz', 'bb', 'bza')
+	);
+
+	let txt = $.help(bin, tree, '__default__');
+	t.is(txt, '\n  Description\n    program description\n\n  Usage\n    $ bin <command> [options]\n\n  Available Commands\n    foo    Hello, foo!\n    bar    Heya, bar!\n    baz    Howdy, baz~!\n\n  For more info, run any command with the `--help` flag\n    $ bin foo --help\n    $ bin bar --help\n\n  Options\n    -v, --version    Displays current version\n    -h, --help       Displays this message\n');
+
+	let foo = $.help(bin, tree, 'foo');
+	t.is(foo, '\n  Description\n    Hello, foo!\n\n  Usage\n    $ bin foo [options]\n\n  Aliases\n    $ bin f\n\n  Options\n    -h, --help    Displays this message\n');
+
+	let bar = $.help(bin, tree, 'bar');
+	t.is(bar, '\n  Description\n    Heya, bar!\n\n  Usage\n    $ bin bar <fizz> [options]\n\n  Aliases\n    $ bin b\n    $ bin ba\n\n  Options\n    -h, --help    Displays this message\n');
+
+	let baz = $.help(bin, tree, 'baz');
+	t.is(baz, '\n  Description\n    Howdy, baz~!\n\n  Usage\n    $ bin baz <buzz> [options]\n\n  Aliases\n    $ bin bz\n    $ bin bb\n    $ bin bza\n\n  Options\n    -h, --help    Displays this message\n');
+
+	t.end();
+});

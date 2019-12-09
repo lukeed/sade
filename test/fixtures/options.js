@@ -4,6 +4,7 @@ const sade = require('../../lib');
 sade('bin')
 	.option('-g, --global', 'global')
 	.command('foo')
+	.alias('f')
 	.option('-l, --long', 'long flag')
 	.option('-s, --short', 'short flag')
 	.option('-h, --hello', 'override')
@@ -15,6 +16,7 @@ sade('bin')
 	})
 
 	.command('bar <dir>')
+	.alias('b')
 	.option('--only', 'no short alias')
 	.action((dir, opts) => {
 		let pre = opts.only ? '~> (only)' : '~>';

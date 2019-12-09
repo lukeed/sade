@@ -5,7 +5,7 @@ sade('bin')
 	.option('--bool', 'flag defined')
 	.option('-g, --global', 'global flag')
 
-	.command('foo')
+	.command('foo', '', { alias: 'f' })
 	.option('-l, --local', 'command flag')
 	.action(opts => {
 		console.log(`~> ran "foo" with ${JSON.stringify(opts)}`);

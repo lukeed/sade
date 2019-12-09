@@ -5,7 +5,7 @@ sade('bin')
 	.option('-g, --global', 'global flag')
 	.option('--flag1', 'no alias or default')
 
-	.command('foo')
+	.command('foo', '', { alias: 'f' })
 	.option('-l, --local', 'command flag')
 	.option('--flag2', 'no alias or default')
 	.action(opts => {
