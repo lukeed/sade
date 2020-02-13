@@ -314,18 +314,32 @@ test('(usage) subcommands :: error :: invalid command', t => {
 test('(usage) default', t => {
 	let pid1 = exec('default.js', []);
 	t.is(pid1.status, 0, 'exits without error code');
-	t.is(pid1.stdout.toString(), '~> ran "foo" action\n', '~> ran default command');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action w/ "~EMPTY~" arg\n', '~> ran default command');
 	t.is(pid1.stderr.length, 0, '~> stderr is empty');
 
 	let pid2 = exec('default.js', ['foo']);
 	t.is(pid2.status, 0, 'exits without error code');
-	t.is(pid2.stdout.toString(), '~> ran "foo" action\n', '~> ran default command (direct)');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action w/ "~EMPTY~" arg\n', '~> ran default command (direct)');
 	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	let pid3 = exec('default.js', ['bar']);
 	t.is(pid3.status, 0, 'exits without error code');
 	t.is(pid3.stdout.toString(), '~> ran "bar" action\n', '~> ran "bar" command');
 	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) default :: args', t => {
+	let pid1 = exec('default.js', ['hello']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('default.js', ['foo', 'hello']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n', '~> ran default command (direct)');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	t.end();
 });
@@ -338,7 +352,7 @@ test('(usage) default :: help', t => {
 
 	let pid2 = exec('default.js', ['foo', '-h']);
 	t.is(pid2.status, 0, 'exits without error code');
-	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [options]'), '~> shows command help w/ "Usage" text');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [dir] [options]'), '~> shows command help w/ "Usage" text');
 	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	let pid3 = exec('default.js', ['bar', '-h']);
@@ -698,18 +712,37 @@ test('(usage) alias :: subcommands :: help', t => {
 test('(usage) alias :: default', t => {
 	let pid1 = exec('default.js', []);
 	t.is(pid1.status, 0, 'exits without error code');
-	t.is(pid1.stdout.toString(), '~> ran "foo" action\n', '~> ran default command');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action w/ "~EMPTY~" arg\n', '~> ran default command');
 	t.is(pid1.stderr.length, 0, '~> stderr is empty');
 
 	let pid2 = exec('default.js', ['f']);
 	t.is(pid2.status, 0, 'exits without error code');
-	t.is(pid2.stdout.toString(), '~> ran "foo" action\n', '~> ran default command (direct)');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action w/ "~EMPTY~" arg\n', '~> ran default command (direct)');
 	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
-	let pid3 = exec('default.js', ['b']);
+	let pid3 = exec('default.js', ['f', 'hello']);
 	t.is(pid3.status, 0, 'exits without error code');
-	t.is(pid3.stdout.toString(), '~> ran "bar" action\n', '~> ran "bar" command');
+	t.is(pid3.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n', '~> ran default command (direct)');
 	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	let pid4 = exec('default.js', ['b']);
+	t.is(pid4.status, 0, 'exits without error code');
+	t.is(pid4.stdout.toString(), '~> ran "bar" action\n', '~> ran "bar" command');
+	t.is(pid4.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) default :: args', t => {
+	let pid1 = exec('default.js', ['hello']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('default.js', ['f', 'hello']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n', '~> ran default command (direct)');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	t.end();
 });
@@ -722,7 +755,7 @@ test('(usage) alias :: default :: help', t => {
 
 	let pid2 = exec('default.js', ['f', '-h']);
 	t.is(pid2.status, 0, 'exits without error code');
-	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [options]'), '~> shows command help w/ "Usage" text');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [dir] [options]'), '~> shows command help w/ "Usage" text');
 	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	let pid3 = exec('default.js', ['b', '-h']);
@@ -1005,17 +1038,36 @@ test('(usage) order :: subcommands :: help', t => {
 test('(usage) order :: default', t => {
 	let pid1 = exec('default.js', ['--foo', 'bar']);
 	t.is(pid1.status, 0, 'exits without error code');
-	t.is(pid1.stdout.toString(), '~> ran "foo" action\n', '~> ran default command');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action w/ "~EMPTY~" arg\n', '~> ran default command');
 	t.is(pid1.stderr.length, 0, '~> stderr is empty');
 
 	let pid2 = exec('default.js', ['--foo', 'bar', 'f']);
 	t.is(pid2.status, 0, 'exits without error code');
-	t.is(pid2.stdout.toString(), '~> ran "foo" action\n', '~> ran default command (direct)');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action w/ "~EMPTY~" arg\n', '~> ran default command (direct)');
 	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	let pid3 = exec('default.js', ['--foo', 'bar', 'b']);
 	t.is(pid3.status, 0, 'exits without error code');
 	t.is(pid3.stdout.toString(), '~> ran "bar" action\n', '~> ran "bar" command');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) default :: args', t => {
+	let pid1 = exec('default.js', ['--foo', 'bar', 'hello']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('default.js', ['--foo', 'bar', 'foo', 'hello']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n', '~> ran default command (direct)');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	let pid3 = exec('default.js', ['--foo', 'bar', 'foo', 'hello']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.is(pid3.stdout.toString(), '~> ran "foo" action w/ "hello" arg\n', '~> ran default command (direct)');
 	t.is(pid3.stderr.length, 0, '~> stderr is empty');
 
 	t.end();
@@ -1029,7 +1081,7 @@ test('(usage) order :: default :: help', t => {
 
 	let pid2 = exec('default.js', ['--foo', 'bar', 'f', '-h']);
 	t.is(pid2.status, 0, 'exits without error code');
-	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [options]'), '~> shows command help w/ "Usage" text');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [dir] [options]'), '~> shows command help w/ "Usage" text');
 	t.is(pid2.stderr.length, 0, '~> stderr is empty');
 
 	let pid3 = exec('default.js', ['--foo', 'bar', 'b', '-h']);

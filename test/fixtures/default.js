@@ -2,8 +2,8 @@
 const sade = require('../../lib');
 
 sade('bin')
-	.command('foo', null, { alias: 'f', default:true })
-	.action(() => console.log('~> ran "foo" action'))
+	.command('foo [dir]', null, { alias: 'f', default:true })
+	.action(dir => console.log(`~> ran "foo" action w/ "${dir || '~EMPTY~'}" arg`))
 
 	.command('bar')
 	.alias('b')
