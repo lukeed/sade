@@ -750,3 +750,310 @@ test('(usage) alias :: pre-command :: throws', t => {
 	t.true(pid.stderr.toString().includes('Error: Cannot call `alias()` before defining a command'), '~> threw Error w/ message');
 	t.end();
 });
+
+
+// ---
+// Input Order
+// ---
+
+
+test('(usage) order :: basic', t => {
+	let pid1 = exec('basic.js', ['--foo', 'bar', 'f']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action\n', '~> command invoked');
+
+	let pid2 = exec('basic.js', ['--foo', 'bar', 'fo']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action\n', '~> command invoked');
+
+	t.end();
+});
+
+test('(usage) order :: basic :: error :: invalid command', t => {
+	let pid = exec('basic.js', ['--foo', 'bar', 'fff']);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(
+		pid.stderr.toString(),
+		'\n  ERROR\n    Invalid command: fff\n\n  Run `$ bin --help` for more info.\n\n',
+		'~> stderr has "Invalid command: fff" error message'
+	);
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	t.end();
+});
+
+test('(usage) order :: basic :: help', t => {
+	let pid1 = exec('basic.js', ['--foo', 'bar', '-h']);
+	t.is(pid1.status, 0, 'exits with error code');
+	t.true(pid1.stdout.toString().includes('Available Commands\n    foo'), '~> shows global help w/ "Available Commands" text');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('basic.js', ['--foo', 'bar', 'f', '-h']);
+	t.is(pid2.status, 0, 'exits with error code');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [options]'), '~> shows command help w/ "Usage" text');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+
+test('(usage) order :: args.required', t => {
+	let pid = exec('args.js', ['--foo', 'bar', 'f', 'value']);
+	t.is(pid.status, 0, 'exits without error code');
+	t.is(pid.stdout.toString(), '~> ran "foo" with "value" arg\n', '~> command invoked');
+	t.is(pid.stderr.length, 0, '~> stderr is empty');
+	t.end();
+});
+
+test('(usage) order :: args.required :: error :: missing argument', t => {
+	let pid = exec('args.js', ['--foo', 'bar', 'f']);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(
+		pid.stderr.toString(),
+		'\n  ERROR\n    Insufficient arguments!\n\n  Run `$ bin foo --help` for more info.\n\n',
+		'~> stderr has "Insufficient arguments!" error message'
+	);
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	t.end();
+});
+
+test('(usage) order :: args.optional', t => {
+	let pid = exec('args.js', ['--foo', 'bar', 'b']);
+	t.is(pid.status, 0, 'exits without error code');
+	t.is(pid.stdout.toString(), '~> ran "bar" with "~default~" arg\n', '~> command invoked');
+	t.is(pid.stderr.length, 0, '~> stderr is empty');
+	t.end();
+});
+
+test('(usage) order :: args.optional w/ value', t => {
+	let pid = exec('args.js', ['--foo', 'bar', 'b', 'value']);
+	t.is(pid.status, 0, 'exits without error code');
+	t.is(pid.stdout.toString(), '~> ran "bar" with "value" arg\n', '~> command invoked');
+	t.is(pid.stderr.length, 0, '~> stderr is empty');
+	t.end();
+});
+
+
+
+test('(usage) order :: options.long', t => {
+	let pid1 = exec('options.js', ['--foo', 'bar', 'f', '--long']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "long" option\n', '~> command invoked');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('options.js', ['--foo', 'bar', 'f', '-l']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "long" option\n', '~> command invoked');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) order :: options.short', t => {
+	let pid1 = exec('options.js', ['--foo', 'bar', 'f', '--short']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "short" option\n', '~> command invoked');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('options.js', ['--foo', 'bar', 'f', '-s']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "short" option\n', '~> command invoked');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) order :: options.hello', t => {
+	let pid1 = exec('options.js', ['--foo', 'bar', 'f', '--hello']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "hello" option\n', '~> command invoked');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	// shows that '-h' is always reserved
+	let pid2 = exec('options.js', ['--foo', 'bar', 'f', '-h']);
+	let stdout = pid2.stdout.toString();
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.not(stdout, '~> ran "long" option\n', '~> did NOT run custom "-h" option');
+	t.true(stdout.includes('-h, --help      Displays this message'), '~~> shows `--help` text');
+
+	t.end();
+});
+
+test('(usage) order :: options.extra', t => {
+	let pid = exec('options.js', ['--foo', 'bar', 'f', '--extra=opts', '--404']);
+	t.is(pid.status, 0, 'exits without error code');
+	t.is(pid.stdout.toString(), '~> default with {"404":true,"_":[],"foo":"bar","extra":"opts"}\n', '~> command invoked');
+	t.is(pid.stderr.length, 0, '~> stderr is empty');
+	t.end();
+});
+
+test('(usage) order :: options.global', t => {
+	let pid1 = exec('options.js', ['--foo', 'bar', 'f', '--global']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> default with {"_":[],"foo":"bar","global":true,"g":true}\n', '~> command invoked');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('options.js', ['--foo', 'bar', 'f', '-g', 'hello']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> default with {"_":[],"foo":"bar","g":"hello","global":"hello"}\n', '~> command invoked');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) order :: options w/o alias', t => {
+	let pid1 = exec('options.js', ['--foo', 'bar', 'b', 'hello']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+	t.is(pid1.stdout.toString(), '~> "bar" with "hello" value\n', '~> command invoked');
+
+	let pid2 = exec('options.js', ['--foo', 'bar', 'b', 'hello', '--only']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+	t.is(pid2.stdout.toString(), '~> (only) "bar" with "hello" value\n', '~> command invoked');
+
+	let pid3 = exec('options.js', ['--foo', 'bar', 'b', 'hello', '-o']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+	t.is(pid3.stdout.toString(), '~> "bar" with "hello" value\n', '~> command invoked');
+
+	t.end();
+});
+
+
+test('(usage) order :: unknown.custom', t => {
+	let pid1 = exec('unknown2.js', ['f', '--global', '--local']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+	t.is(pid1.stdout.toString(), '~> ran "foo" with {"_":[],"global":true,"local":true,"g":true,"l":true}\n', '~> command invoked');
+
+	let pid2 = exec('unknown2.js', ['--foo', 'bar', 'f', '--bar']);
+	t.is(pid2.status, 1, 'exits with error code');
+	t.is(pid2.stdout.length, 0, '~> stdout is empty');
+	t.is(
+		pid2.stderr.toString(),
+		'\n  ERROR\n    Custom error: --foo\n\n  Run `$ bin --help` for more info.\n\n', // came first
+		'~> stderr has "Custom error: --foo" error message' // came first
+	);
+
+	t.end();
+});
+
+
+test('(usage) order :: unknown.plain', t => {
+	let pid1 = exec('unknown2.js', ['f', '--flag1', '--flag2']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+	t.is(pid1.stdout.toString(), '~> ran "foo" with {"_":[],"flag1":true,"flag2":true}\n', '~> command invoked');
+
+	let pid2 = exec('unknown2.js', ['--foo', 'bar', 'f', '--flag3']);
+	t.is(pid2.status, 1, 'exits with error code');
+	t.is(pid2.stdout.length, 0, '~> stdout is empty');
+	t.is(
+		pid2.stderr.toString(),
+		'\n  ERROR\n    Custom error: --foo\n\n  Run `$ bin --help` for more info.\n\n', // came first
+		'~> stderr has "Custom error: --foo" error message' // came first
+	);
+
+	t.end();
+});
+
+
+
+test('(usage) order :: subcommands', t => {
+	let pid1 = exec('subs.js', ['--foo', 'bar', 'r']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "remote" action\n', '~> ran parent');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('subs.js', ['--foo', 'bar', 'rr', 'origin', 'foobar']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "remote rename" with "origin" and "foobar" args\n', '~> ran "rename" child');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	let pid3 = exec('subs.js', ['--foo', 'bar', 'ra', 'origin', 'foobar']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.is(pid3.stdout.toString(), '~> ran "remote add" with "origin" and "foobar" args\n', '~> ran "add" child');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) order :: subcommands :: help', t => {
+	let pid1 = exec('subs.js', ['--foo', 'bar', '--help']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.true(pid1.stdout.toString().includes('Available Commands\n    remote           \n    remote add       \n    remote rename'), '~> shows global help w/ "Available Commands" text');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('subs.js', ['--foo', 'bar', 'r', '--help']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin remote [options]'), '~> shows "remote" help text');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	let pid3 = exec('subs.js', ['--foo', 'bar', 'rr', '--help']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.true(pid3.stdout.toString().includes('Usage\n    $ bin remote rename <old> <new> [options]'), '~> shows "remote rename" help text');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+
+test('(usage) order :: default', t => {
+	let pid1 = exec('default.js', ['--foo', 'bar']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.is(pid1.stdout.toString(), '~> ran "foo" action\n', '~> ran default command');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('default.js', ['--foo', 'bar', 'f']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.is(pid2.stdout.toString(), '~> ran "foo" action\n', '~> ran default command (direct)');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	let pid3 = exec('default.js', ['--foo', 'bar', 'b']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.is(pid3.stdout.toString(), '~> ran "bar" action\n', '~> ran "bar" command');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) order :: default :: help', t => {
+	let pid1 = exec('default.js', ['--foo', 'bar', '--help']);
+	t.is(pid1.status, 0, 'exits without error code');
+	t.true(pid1.stdout.toString().includes('Available Commands\n    foo    \n    bar'), '~> shows global help w/ "Available Commands" text');
+	t.is(pid1.stderr.length, 0, '~> stderr is empty');
+
+	let pid2 = exec('default.js', ['--foo', 'bar', 'f', '-h']);
+	t.is(pid2.status, 0, 'exits without error code');
+	t.true(pid2.stdout.toString().includes('Usage\n    $ bin foo [options]'), '~> shows command help w/ "Usage" text');
+	t.is(pid2.stderr.length, 0, '~> stderr is empty');
+
+	let pid3 = exec('default.js', ['--foo', 'bar', 'b', '-h']);
+	t.is(pid3.status, 0, 'exits without error code');
+	t.true(pid3.stdout.toString().includes('Usage\n    $ bin bar [options]'), '~> shows command help w/ "Usage" text');
+	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	t.end();
+});
+
+test('(usage) order :: single :: throws', t => {
+	let pid = exec('alias1.js', ['--foo', 'bar']);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	// throws an error in the process
+	t.true(pid.stderr.toString().includes('Error: Cannot call `alias()` in "single" mode'), '~> threw Error w/ message');
+	t.end();
+});
+
+test('(usage) order :: pre-command :: throws', t => {
+	let pid = exec('alias2.js', ['--foo', 'bar']);
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	// throws an error in the process
+	t.true(pid.stderr.toString().includes('Error: Cannot call `alias()` before defining a command'), '~> threw Error w/ message');
+	t.end();
+});
