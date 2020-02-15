@@ -212,6 +212,20 @@ test('prog.action (multi optional)', t => {
 	(c=true) && run(); // +4 tests
 });
 
+test('prog.parse', t => {
+	t.plan(1);
+
+	let ctx = sade('foo')
+		.command('build')
+		.action(() => {});
+
+	let args = ['', '', 'build'];
+	let argsCopy = args.slice();
+	ctx.parse(argsCopy);
+
+	t.deepEqual(argsCopy, args, '~> process.argv is not mutated');
+});
+
 test('prog.parse :: lazy', t => {
 	t.plan(14);
 
