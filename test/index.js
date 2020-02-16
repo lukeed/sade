@@ -212,18 +212,68 @@ test('prog.action (multi optional)', t => {
 	(c=true) && run(); // +4 tests
 });
 
-test('prog.parse', t => {
-	t.plan(1);
+test('prog.parse :: safe :: default', t => {
+	let ctx = sade('foo').command('build', '', { default: true });
 
-	let ctx = sade('foo')
-		.command('build')
-		.action(() => {});
+	let argv1 = ['', '', 'build'];
+	let foo = ctx.parse(argv1, { lazy: true });
+	t.deepEqual(argv1, ['', '', 'build'], '~> argv unchanged');
+	t.deepEqual(foo.args, [{ _: [] }], '~> args correct');
 
-	let args = ['', '', 'build'];
-	let argsCopy = args.slice();
-	ctx.parse(argsCopy);
+	let argv2 = ['', ''];
+	let bar = ctx.parse(argv2, { lazy: true });
+	t.deepEqual(argv2, ['', ''], '~> argv unchanged');
+	t.deepEqual(bar.args, [{ _: [] }], '~> args correct');
 
-	t.deepEqual(argsCopy, args, '~> process.argv is not mutated');
+	t.end();
+});
+
+test('prog.parse :: safe :: alias', t => {
+	let ctx = sade('foo').command('build').alias('b');
+
+	let argv1 = ['', '', 'build'];
+	let foo = ctx.parse(argv1, { lazy: true });
+	t.deepEqual(argv1, ['', '', 'build'], '~> argv unchanged');
+	t.deepEqual(foo.args, [{ _: [] }], '~> args correct');
+
+	let argv2 = ['', '', 'b'];
+	let bar = ctx.parse(argv2, { lazy: true });
+	t.deepEqual(argv2, ['', '', 'b'], '~> argv unchanged');
+	t.deepEqual(bar.args, [{ _: [] }], '~> args correct');
+
+	t.end();
+});
+
+test('prog.parse :: safe :: default :: flags', t => {
+	let ctx = sade('foo').command('build <dir>', '', { default: true });
+
+	let argv1 = ['', '', '-r', 'dotenv', 'build', 'public', '--fresh'];
+	let foo = ctx.parse(argv1, { lazy: true });
+	t.deepEqual(argv1, ['', '', '-r', 'dotenv', 'build', 'public', '--fresh'], '~> argv unchanged');
+	t.deepEqual(foo.args, ['public', { _: [], r: 'dotenv', fresh: true }], '~> args correct');
+
+	let argv2 = ['', '', '-r', 'dotenv', 'public', '--fresh'];
+	let bar = ctx.parse(argv2, { lazy: true });
+	t.deepEqual(argv2, ['', '', '-r', 'dotenv', 'public', '--fresh'], '~> argv unchanged');
+	t.deepEqual(bar.args, ['public', { _: [], r: 'dotenv', fresh: true }], '~> args correct');
+
+	t.end();
+});
+
+test('prog.parse :: safe :: alias :: flags', t => {
+	let ctx = sade('foo').command('build <dir>').alias('b');
+
+	let argv1 = ['', '', '-r', 'dotenv', 'build', 'public', '--fresh'];
+	let foo = ctx.parse(argv1, { lazy: true });
+	t.deepEqual(argv1, ['', '', '-r', 'dotenv', 'build', 'public', '--fresh'], '~> argv unchanged');
+	t.deepEqual(foo.args, ['public', { _: [], r: 'dotenv', fresh: true }], '~> args correct');
+
+	let argv2 = ['', '', '-r', 'dotenv', 'b', 'public', '--fresh'];
+	let bar = ctx.parse(argv2, { lazy: true });
+	t.deepEqual(argv2, ['', '', '-r', 'dotenv', 'b', 'public', '--fresh'], '~> argv unchanged');
+	t.deepEqual(bar.args, ['public', { _: [], r: 'dotenv', fresh: true }], '~> args correct');
+
+	t.end();
 });
 
 test('prog.parse :: lazy', t => {
