@@ -275,7 +275,7 @@ test('(usage) subcommands', t => {
 test('(usage) subcommands :: help', t => {
 	let pid1 = exec('subs.js', ['--help']);
 	t.is(pid1.status, 0, 'exits without error code');
-	t.true(pid1.stdout.toString().includes('Available Commands\n    remote           \n    remote add       \n    remote rename'), '~> shows global help w/ "Available Commands" text');
+	t.true(pid1.stdout.toString().includes('Available Commands\n    remote'), '~> shows global help w/ "Available Commands" text');
 	t.is(pid1.stderr.length, 0, '~> stderr is empty');
 
 	let pid2 = exec('subs.js', ['remote', '--help']);
@@ -286,7 +286,19 @@ test('(usage) subcommands :: help', t => {
 	let pid3 = exec('subs.js', ['remote', 'rename', '--help']);
 	t.is(pid3.status, 0, 'exits without error code');
 	t.true(pid3.stdout.toString().includes('Usage\n    $ bin remote rename <old> <new> [options]'), '~> shows "remote rename" help text');
+	t.false(pid3.stdout.toString().includes('    $ bin remote child grandchild'), '~> does not show "remote child grandchild" help text');
 	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	let pid4 = exec('subs.js', ['remote', 'child', '--help']);
+	t.is(pid4.status, 0, 'exits without error code');
+	t.true(pid4.stdout.toString().includes('Usage\n    $ bin remote child [options]'), '~> shows "remote child" help text');
+	t.true(pid4.stdout.toString().includes('Available Commands\n    remote child grandchild    \n'), '~> only shows child commands of current command in help text');
+	t.is(pid4.stderr.length, 0, '~> stderr is empty');
+
+	let pid5 = exec('subs.js', ['remote', 'child', 'grandchild', '--help']);
+	t.is(pid5.status, 0, 'exits without error code');
+	t.true(pid5.stdout.toString().includes('Usage\n    $ bin remote child grandchild <arg> [options]'), '~> shows "remote child grandchild" help text');
+	t.is(pid5.stderr.length, 0, '~> stderr is empty');
 
 	t.end();
 });

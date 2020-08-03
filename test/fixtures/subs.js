@@ -17,4 +17,14 @@ sade('bin')
     console.log(`~> ran "remote rename" with "${old}" and "${nxt}" args`);
   })
 
+  .command('remote child')
+  .action((opts) => {
+    console.log(`~> ran "remote child" action`);
+  })
+
+  .command('remote child grandchild <arg>')
+  .action((arg, opts) => {
+    console.log(`~> ran "remote child grandchild" with "${arg}" arg`);
+  })
+
 	.parse(process.argv);
