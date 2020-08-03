@@ -11,7 +11,7 @@
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
-    "url": "lukeed.com"
+    "url": "https://lukeed.com"
   },
   "scripts": {
     "test": "tape test/*.js | tap-spec"
