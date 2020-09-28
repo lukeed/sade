@@ -1012,6 +1012,11 @@ test('(usage) order :: subcommands', t => {
 	t.is(pid3.stdout.toString(), '~> ran "remote add" with "origin" and "foobar" args\n', '~> ran "add" child');
 	t.is(pid3.stderr.length, 0, '~> stderr is empty');
 
+	let pid4 = exec('subs.js', ['--foo', 'bar', 'remote', 'new', 'origin', 'foobar']);
+	t.is(pid4.status, 0, 'exits without error code');
+	t.is(pid4.stdout.toString(), '~> ran "remote add" with "origin" and "foobar" args\n', '~> ran "add" child');
+	t.is(pid4.stderr.length, 0, '~> stderr is empty');
+
 	t.end();
 });
 
@@ -1030,6 +1035,11 @@ test('(usage) order :: subcommands :: help', t => {
 	t.is(pid3.status, 0, 'exits without error code');
 	t.true(pid3.stdout.toString().includes('Usage\n    $ bin remote rename <old> <new> [options]'), '~> shows "remote rename" help text');
 	t.is(pid3.stderr.length, 0, '~> stderr is empty');
+
+	let pid4 = exec('subs.js', ['--foo', 'bar', 'remote', 'new', '--help']);
+	t.is(pid4.status, 0, 'exits without error code');
+	t.is(pid4.stdout.toString(), '\n  Usage\n    $ bin remote add <name> <url> [options]\n\n  Aliases\n    $ bin ra\n    $ bin remote new\n\n  Options\n    -h, --help    Displays this message\n\n');
+	t.is(pid4.stderr.length, 0, '~> stderr is empty');
 
 	t.end();
 });

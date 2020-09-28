@@ -7,7 +7,7 @@ sade('bin')
     console.log('~> ran "remote" action');
   })
 
-	.command('remote add <name> <url>', '', { alias: 'ra' })
+	.command('remote add <name> <url>', '', { alias: ['ra', 'remote new'] })
   .action((name, uri, opts) => {
 		console.log(`~> ran "remote add" with "${name}" and "${uri}" args`);
   })
