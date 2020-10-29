@@ -219,7 +219,7 @@ Let's reconstruct the `npm install` command as a Sade program:
 sade('npm')
   // ...
   .command('install [package]', 'Install a package', {
-    alias: ['i', 'add', 'isntall']
+    alias: ['i', 'add', 'install']
   })
   .option('-P, --save-prod', 'Package will appear in your dependencies.')
   .option('-D, --save-dev', 'Package will appear in your devDependencies.')
@@ -257,7 +257,7 @@ When we run `npm install --help` &mdash; ***or*** the help flag with any of `ins
   Aliases
     $ npm i
     $ npm add
-    $ npm isntall
+    $ npm install
 
   Options
     -P, --save-prod        Package will appear in your dependencies.
