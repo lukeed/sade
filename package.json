@@ -3,7 +3,14 @@
   "version": "1.7.4",
   "description": "Smooth (CLI) operator 🎶",
   "repository": "lukeed/sade",
-  "main": "lib/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./lib/index.js",
+      "import": "./lib/mjs/index.js"
+    }
+  },
+  "types": "lib/mjs/index.d.js",
   "license": "MIT",
   "files": [
     "lib"
@@ -14,10 +21,11 @@
     "url": "https://lukeed.com"
   },
   "scripts": {
+    "build": "rimraf lib/** && tsc -p tsconfig.cjs.json && tsc -p tsconfig.mjs.json",
     "test": "tape test/*.js | tap-spec"
   },
   "dependencies": {
-    "mri": "^1.1.0"
+    "mri": "workspace:^1.1.6"
   },
   "engines": {
     "node": ">= 6"
@@ -32,7 +40,10 @@
     "argv"
   ],
   "devDependencies": {
-    "tap-spec": "^4.1.1",
-    "tape": "^4.8.0"
+    "@types/mri": "^1.1.1",
+    "rimraf": "^3.0.2",
+    "tap-spec": "^4.1.2",
+    "tape": "^4.13.3",
+    "typescript": "^4.3.5"
   }
 }

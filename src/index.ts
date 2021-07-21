@@ -1,11 +1,17 @@
-const mri = require('mri');
-const $ = require('./utils');
+import mri from 'mri';
+import * as $ from './utils.js';
 
 const ALL = '__all__';
 const DEF = '__default__';
 
 class Sade {
-	constructor(name, isOne) {
+	bin: string
+	ver: string
+	default: string
+	tree: any
+	single: boolean
+	curr: string
+	constructor(name: string, isOne?: boolean) {
 		let [bin, ...rest] = name.split(/\s+/);
 		isOne = isOne || rest.length > 0;
 
@@ -20,15 +26,15 @@ class Sade {
 		this.curr = ''; // reset
 	}
 
-	command(str, desc, opts={}) {
+	command(str: string, desc?: string, opts:{alias?: any, default?: any}={}) {
 		if (this.single) {
 			throw new Error('Disable "single" mode to add commands');
 		}
 
 		// All non-([|<) are commands
-		let cmd=[], usage=[], rgx=/(\[|<)/;
+		let cmd: string|string[]=[], usage: string|string[]=[], rgx=/(\[|<)/;
 		str.split(/\s+/).forEach(x => {
-			(rgx.test(x.charAt(0)) ? usage : cmd).push(x);
+			(rgx.test(x.charAt(0)) ? usage as string[] : cmd as string[]).push(x);
 		});
 
 		// Back to string~!
@@ -52,20 +58,20 @@ class Sade {
 		return this;
 	}
 
-	describe(str) {
+	describe(str: string) {
 		this.tree[this.curr || DEF].describe = Array.isArray(str) ? str : $.sentences(str);
 		return this;
 	}
 
-	alias(...names) {
+	alias(...names: string[]) {
 		if (this.single) throw new Error('Cannot call `alias()` in "single" mode');
 		if (!this.curr) throw new Error('Cannot call `alias()` before defining a command');
 		let arr = this.tree[this.curr].alibi = this.tree[this.curr].alibi.concat(...names);
-		arr.forEach(key => this.tree[key] = this.curr);
+		arr.forEach((key: string) => this.tree[key] = this.curr);
 		return this;
 	}
 
-	option(str, desc, val) {
+	option(str: string, desc: string, val?: any) {
 		let cmd = this.tree[ this.curr || ALL ];
 
 		let [flag, alias] = $.parse(str);
@@ -91,22 +97,22 @@ class Sade {
 		return this;
 	}
 
-	action(handler) {
+	action(handler: any) {
 		this.tree[ this.curr || DEF ].handler = handler;
 		return this;
 	}
 
-	example(str) {
+	example(str: string) {
 		this.tree[ this.curr || DEF ].examples.push(str);
 		return this;
 	}
 
-	version(str) {
+	version(str: string) {
 		this.ver = str;
 		return this;
 	}
 
-	parse(arr, opts={}) {
+	parse(arr: string[], opts:{alias?: any, default?: any, lazy?: any, unknown?: (arg: string)=>string}={}) {
 		arr = arr.slice(); // copy
 		let offset=2, tmp, idx, isVoid, cmd;
 		let alias = { h:'help', v:'version' };
@@ -150,7 +156,7 @@ class Sade {
 		}
 
 		// show main help if relied on "default" for multi-cmd
-		if (argv.help) return this.help(!isSingle && !isVoid && name);
+		if (argv.help) return this.help((!isSingle && !isVoid && name) || '');
 		if (argv.version) return this._version();
 
 		if (!isSingle && cmd === void 0) {
@@ -167,21 +173,21 @@ class Sade {
 		if (!!~idx) arr.splice(idx, tmp.length);
 
 		let vals = mri(arr.slice(offset), opts);
-		if (!vals || typeof vals === 'string') {
+		if (!vals || typeof vals === 'string') {
 			return $.error(bin, vals || 'Parsed unknown option flag(s)!');
 		}
 
 		let segs = cmd.usage.split(/\s+/);
-		let reqs = segs.filter(x => x.charAt(0)==='<');
-		let args = vals._.splice(0, reqs.length);
+		let reqs = segs.filter((x: string) => x.charAt(0)==='<');
+		let args = (vals._ as any).splice(0, reqs.length);
 
 		if (args.length < reqs.length) {
 			if (name) bin += ` ${name}`; // for help text
 			return $.error(bin, 'Insufficient arguments!');
 		}
 
-		segs.filter(x => x.charAt(0)==='[').forEach(_ => {
-			args.push(vals._.shift()); // adds `undefined` per [slot] if no more
+		segs.filter((x: string) => x.charAt(0)==='[').forEach((_: any) => {
+			args.push((vals._ as any).shift()); // adds `undefined` per [slot] if no more
 		});
 
 		args.push(vals); // flags & co are last
@@ -189,7 +195,7 @@ class Sade {
 		return opts.lazy ? { args, name, handler } : handler.apply(null, args);
 	}
 
-	help(str) {
+	help(str: string) {
 		console.log(
 			$.help(this.bin, this.tree, str || DEF, this.single)
 		);
@@ -200,4 +206,4 @@ class Sade {
 	}
 }
 
-module.exports = (str, isOne) => new Sade(str, isOne);
+export default (str: string, isOne?: boolean) => new Sade(str, isOne);
