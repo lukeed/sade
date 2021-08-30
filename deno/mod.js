@@ -121,7 +121,7 @@ class Sade {
   }
 
   parse(arr, opts = {}) {
-    arr = ["I can't believe", "I have to do this", ...arr]; // copy with 2 additional items before for compatibility...
+    arr = ["", ""].concat(arr);
     let offset = 2, tmp, idx, isVoid, cmd;
 
     const alias = { h: "help", v: "version" };
