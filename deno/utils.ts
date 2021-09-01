@@ -4,14 +4,31 @@ const ALL = '__all__';
 const DEF = '__default__';
 const NL = '\n';
 
-function format(arr) {
-	if (!arr.length) return '';
+export type Value = string|number|boolean;
+export type Option = [string, string] | [string, string, Value];
+export type Handler = (...args: any[]) => any;
+
+export type Tree = {
+	[command: string]: {
+		usage: string;
+		alibi: string[];
+		options: Option[];
+		examples: string[];
+		alias: Record<string, string|string[]>;
+		default: Record<string, Value|undefined>;
+		describe?: string[];
+		handler?: Handler;
+	}
+}
+
+function format(arr: (Option | string[])[]): string[] {
+	if (!arr.length) return [];
 	let len = maxLen( arr.map(x => x[0]) ) + GAP;
-	let join = a => a[0] + ' '.repeat(len - a[0].length) + a[1] + (a[2] == null ? '' : `  (default ${a[2]})`);
+	let join = (a: Option|string[]) => a[0] + ' '.repeat(len - a[0].length) + a[1] + (a[2] == null ? '' : `  (default ${a[2]})`);
 	return arr.map(join);
 }
 
-function maxLen(arr) {
+function maxLen(arr: string[]): number {
   let c=0, d=0, l=0, i=arr.length;
   if (i) while (i--) {
     d = arr[i].length;
@@ -22,11 +39,11 @@ function maxLen(arr) {
   return arr[l].length;
 }
 
-function noop(s) {
+function noop(s: string) {
 	return s;
 }
 
-function section(str, arr, fn) {
+function section(str: string, arr: string[] | undefined, fn: (x: string) => string) {
 	if (!arr || !arr.length) return '';
 	let i=0, out='';
 	out += (NL + __ + str);
@@ -36,12 +53,12 @@ function section(str, arr, fn) {
 	return out + NL;
 }
 
-export function help(bin, tree, key, single) {
+export function help(bin: string, tree: Tree, key: string, single: boolean) {
 	let out='', cmd=tree[key], pfx=`$ ${bin}`, all=tree[ALL];
-	let prefix = s => `${pfx} ${s}`.replace(/\s+/g, ' ');
+	let prefix = (s: string) => `${pfx} ${s}`.replace(/\s+/g, ' ');
 
 	// update ALL & CMD options
-	let tail = [['-h, --help', 'Displays this message']];
+	let tail: Option[] = [['-h, --help', 'Displays this message']];
 	if (key === DEF) tail.unshift(['-v, --version', 'Displays current version']);
 	cmd.options = (cmd.options || []).concat(all.options, tail);
 
@@ -53,7 +70,7 @@ export function help(bin, tree, key, single) {
 	out += section('Usage', [cmd.usage], prefix);
 
 	if (!single && key === DEF) {
-		let key, rgx=/^__/, help='', cmds=[];
+		let key, rgx=/^__/, help='', cmds: string[][] = [];
 		// General help :: print all non-(alias|internal) commands & their 1st line of helptext
 		for (key in tree) {
 			if (typeof tree[key] == 'string' || rgx.test(key)) continue;
@@ -75,7 +92,7 @@ export function help(bin, tree, key, single) {
 	return out;
 }
 
-export function error(bin, str, num=1) {
+export function error(bin: string, str: string, num=1): never {
 	let out = section('ERROR', [str], noop);
 	out += (NL + __ + `Run \`$ ${bin} --help\` for more info.` + NL);
 	console.error(out);
@@ -83,11 +100,11 @@ export function error(bin, str, num=1) {
 }
 
 // Strips leading `-|--` & extra space(s)
-export function parse(str) {
+export function parse(str?: string) {
 	return (str || '').split(/^-{1,2}|,|\s+-{1,2}|\s+/).filter(Boolean);
 }
 
 // @see https://stackoverflow.com/a/18914855/3577474
-export function sentences(str) {
+export function sentences(str?: string) {
 	return (str || '').replace(/([.?!])\s*(?=[A-Z])/g, '$1|').split('|');
 }

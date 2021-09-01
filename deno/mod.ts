@@ -1,11 +1,19 @@
 import { parse } from "https://deno.land/std@0.106.0/flags/mod.ts";
+import type { Args, ArgParsingOptions } from "https://deno.land/std@0.106.0/flags/mod.ts";
 import * as $ from "./utils.ts";
 
 const ALL = '__all__';
 const DEF = '__default__';
 
 class Sade {
-	constructor(name, isOne) {
+	private bin: string;
+	private ver: string;
+	private tree: $.Tree;
+	private default: string;
+	private single: boolean;
+	private curr: string;
+
+	constructor(name: string, isOne?: boolean) {
 		let [bin, ...rest] = name.split(/\s+/);
 		isOne = isOne || rest.length > 0;
 
@@ -20,27 +28,28 @@ class Sade {
 		this.curr = ''; // reset
 	}
 
-	command(str, desc, opts={}) {
+	command(str: string, desc?: string, opts: { alias?: string|string[]; default?: boolean }= {}) {
 		if (this.single) {
 			throw new Error('Disable "single" mode to add commands');
 		}
 
 		// All non-([|<) are commands
-		let cmd=[], usage=[], rgx=/(\[|<)/;
+		let rgx = /(\[|<)/;
+		let c: string[] = [], u: string[] = [];
 		str.split(/\s+/).forEach(x => {
-			(rgx.test(x.charAt(0)) ? usage : cmd).push(x);
+			(rgx.test(x.charAt(0)) ? u : c).push(x);
 		});
 
 		// Back to string~!
-		cmd = cmd.join(' ');
+		let cmd = c.join(' ');
 
 		if (cmd in this.tree) {
 			throw new Error(`Command already exists: ${cmd}`);
 		}
 
 		// re-include `cmd` for commands
-		cmd.includes('__') || usage.unshift(cmd);
-		usage = usage.join(' '); // to string
+		cmd.includes('__') || u.unshift(cmd);
+		let usage = u.join(' '); // to string
 
 		this.curr = cmd;
 		if (opts.default) this.default=cmd;
@@ -52,20 +61,20 @@ class Sade {
 		return this;
 	}
 
-	describe(str) {
+	describe(str: string[] | string) {
 		this.tree[this.curr || DEF].describe = Array.isArray(str) ? str : $.sentences(str);
 		return this;
 	}
 
-	alias(...names) {
+	alias(...names: (string | string[])[]) {
 		if (this.single) throw new Error('Cannot call `alias()` in "single" mode');
 		if (!this.curr) throw new Error('Cannot call `alias()` before defining a command');
 		let arr = this.tree[this.curr].alibi = this.tree[this.curr].alibi.concat(...names);
-		arr.forEach(key => this.tree[key] = this.curr);
+		arr.forEach(key => this.tree[key] = this.tree[this.curr]);
 		return this;
 	}
 
-	option(str, desc, val) {
+	option(str: string, desc?: string, val?: $.Value) {
 		let cmd = this.tree[ this.curr || ALL ];
 
 		let [flag, alias] = $.parse(str);
@@ -74,14 +83,13 @@ class Sade {
 		str = `--${flag}`;
 		if (alias && alias.length > 0) {
 			str = `-${alias}, ${str}`;
-			let old = cmd.alias[alias];
-			cmd.alias[alias] = (old || []).concat(flag);
+			cmd.alias[alias] = (cmd.alias[alias] || []).concat(flag);
 		}
 
-		let arr = [str, desc || ''];
+		let arr: $.Option = [str, desc || ''];
 
 		if (val !== void 0) {
-			arr.push(val);
+			arr.push(val as string);
 			cmd.default[flag] = val;
 		} else if (!alias) {
 			cmd.default[flag] = void 0;
@@ -91,26 +99,25 @@ class Sade {
 		return this;
 	}
 
-	action(handler) {
+	action(handler: $.Handler) {
 		this.tree[ this.curr || DEF ].handler = handler;
 		return this;
 	}
 
-	example(str) {
+	example(str: string) {
 		this.tree[ this.curr || DEF ].examples.push(str);
 		return this;
 	}
 
-	version(str) {
+	version(str: string) {
 		this.ver = str;
 		return this;
 	}
 
-	parse(arr, opts={}) {
-		arr = ['', ''].concat(arr);
-		let offset=2, tmp, idx, isVoid, cmd;
+	parse(arr: string[], opts: ArgParsingOptions & { lazy?: boolean } = {}) {
+		let offset=0, tmp, idx, isVoid, cmd;
 		let alias = { h:'help', v:'version' };
-		let argv = parse(arr.slice(offset), { alias });
+		let argv = parse(arr, { alias });
 		let isSingle = this.single;
 		let bin = this.bin;
 		let name = '';
@@ -124,8 +131,9 @@ class Sade {
 				tmp = argv._.slice(0, i).join(' ');
 				xyz = this.tree[tmp];
 				if (typeof xyz === 'string') {
+					// @ts-ignore: alias
 					idx = (name=xyz).split(' ');
-					arr.splice(arr.indexOf(argv._[0]), i, ...idx);
+					arr.splice(arr.indexOf(argv._[0] as string), i, ...idx);
 					i += (idx.length - i);
 				} else if (xyz) {
 					name = tmp;
@@ -164,7 +172,7 @@ class Sade {
 
 		tmp = name.split(' ');
 		idx = arr.indexOf(tmp[0], 2);
-		if (!!~idx) arr.splice(idx, tmp.length);
+		if (~idx) arr.splice(idx, tmp.length);
 
 		let vals = parse(arr.slice(offset), opts);
 		if (!vals || typeof vals === 'string') {
@@ -173,7 +181,7 @@ class Sade {
 
 		let segs = cmd.usage.split(/\s+/);
 		let reqs = segs.filter(x => x.charAt(0)==='<');
-		let args = vals._.splice(0, reqs.length);
+		let args: (Args|string|number|undefined)[] = vals._.splice(0, reqs.length);
 
 		if (args.length < reqs.length) {
 			if (name) bin += ` ${name}`; // for help text
@@ -186,10 +194,10 @@ class Sade {
 
 		args.push(vals); // flags & co are last
 		let handler = cmd.handler;
-		return opts.lazy ? { args, name, handler } : handler.apply(null, args);
+		return opts.lazy ? { args, name, handler } : handler!.apply(null, args);
 	}
 
-	help(str) {
+	help(str?: string | false) {
 		console.log(
 			$.help(this.bin, this.tree, str || DEF, this.single)
 		);
@@ -200,4 +208,4 @@ class Sade {
 	}
 }
 
-export default (str, isOne) => new Sade(str, isOne);
+export default (str: string, isOne?: boolean) => new Sade(str, isOne);
