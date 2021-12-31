@@ -1,3 +1,4 @@
+import { minify } from 'terser';
 import * as pkg from './package.json';
 
 /**
@@ -15,6 +16,7 @@ const config = {
 		format: 'cjs',
 		file: pkg.main,
 		exports: 'default',
+		preferConst: true,
 		interop: false,
 		freeze: false,
 		strict: false
@@ -22,6 +24,17 @@ const config = {
 	external: [
 		...Object.keys(pkg.dependencies),
 		...require('module').builtinModules,
+	],
+	plugins: [
+		{
+			name: 'terser',
+			renderChunk(code) {
+				return minify(code, {
+					module: true,
+					toplevel: false
+				})
+			}
+		}
 	]
 }
 
