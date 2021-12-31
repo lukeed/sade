@@ -1,8 +1,7 @@
-const mri = require('mri');
-const $ = require('./utils');
-
-const ALL = '__all__';
-const DEF = '__default__';
+// @ts-check
+import mri from 'mri';
+import * as $ from './utils';
+import { ALL, DEF } from './utils';
 
 class Sade {
 	constructor(name, isOne) {
@@ -200,4 +199,4 @@ class Sade {
 	}
 }
 
-module.exports = (str, isOne) => new Sade(str, isOne);
+export default (str, isOne) => new Sade(str, isOne);
