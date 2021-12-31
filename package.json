@@ -5,8 +5,10 @@
   "repository": "lukeed/sade",
   "module": "lib/index.mjs",
   "main": "lib/index.js",
+  "types": "index.d.ts",
   "license": "MIT",
   "files": [
+    "*.d.ts",
     "lib"
   ],
   "author": {
