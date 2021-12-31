@@ -3,6 +3,7 @@
   "version": "1.7.4",
   "description": "Smooth (CLI) operator 🎶",
   "repository": "lukeed/sade",
+  "module": "lib/index.mjs",
   "main": "lib/index.js",
   "license": "MIT",
   "files": [

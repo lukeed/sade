@@ -6,6 +6,12 @@ import * as pkg from './package.json';
 const config = {
 	input: 'src/index.js',
 	output: [{
+		format: 'esm',
+		file: pkg.module,
+		interop: false,
+		freeze: false,
+		strict: false
+	}, {
 		format: 'cjs',
 		file: pkg.main,
 		exports: 'default',
