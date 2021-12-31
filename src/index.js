@@ -1,4 +1,3 @@
-// @ts-check
 import mri from 'mri';
 import * as $ from './utils';
 import { ALL, DEF } from './utils';
