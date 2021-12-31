@@ -1,5 +1,5 @@
-const test = require('tape');
-const sade = require('../lib');
+import test from 'tape';
+import sade from '../src';
 
 function isShapely(t, tree, key) {
 	t.is(typeof tree[key].usage, 'string', `~> tree[${key}].usage is a string`);

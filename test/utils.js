@@ -1,6 +1,6 @@
-const test = require('tape');
-const sade = require('../lib');
-const $ = require('../lib/utils');
+import test from 'tape';
+import sade from '../src/index';
+import * as $ from '../src/utils';
 
 test('utils.parse', t => {
 	[

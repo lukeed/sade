@@ -1,17 +1,18 @@
-const GAP = 4;
-const __ = '  ';
-const ALL = '__all__';
-const DEF = '__default__';
-const NL = '\n';
+export const ALL = '__all__';
+export const DEF = '__default__';
 
-function format(arr) {
+export const GAP = 4;
+export const __ = '  ';
+export const NL = '\n';
+
+export function format(arr) {
 	if (!arr.length) return '';
 	let len = maxLen( arr.map(x => x[0]) ) + GAP;
 	let join = a => a[0] + ' '.repeat(len - a[0].length) + a[1] + (a[2] == null ? '' : `  (default ${a[2]})`);
 	return arr.map(join);
 }
 
-function maxLen(arr) {
+export function maxLen(arr) {
   let c=0, d=0, l=0, i=arr.length;
   if (i) while (i--) {
     d = arr[i].length;
@@ -22,11 +23,11 @@ function maxLen(arr) {
   return arr[l].length;
 }
 
-function noop(s) {
+export function noop(s) {
 	return s;
 }
 
-function section(str, arr, fn) {
+export function section(str, arr, fn) {
 	if (!arr || !arr.length) return '';
 	let i=0, out='';
 	out += (NL + __ + str);
@@ -36,7 +37,7 @@ function section(str, arr, fn) {
 	return out + NL;
 }
 
-exports.help = function (bin, tree, key, single) {
+export function help(bin, tree, key, single) {
 	let out='', cmd=tree[key], pfx=`$ ${bin}`, all=tree[ALL];
 	let prefix = s => `${pfx} ${s}`.replace(/\s+/g, ' ');
 
@@ -75,7 +76,7 @@ exports.help = function (bin, tree, key, single) {
 	return out;
 }
 
-exports.error = function (bin, str, num=1) {
+export function error(bin, str, num=1) {
 	let out = section('ERROR', [str], noop);
 	out += (NL + __ + `Run \`$ ${bin} --help\` for more info.` + NL);
 	console.error(out);
@@ -83,11 +84,11 @@ exports.error = function (bin, str, num=1) {
 }
 
 // Strips leading `-|--` & extra space(s)
-exports.parse = function (str) {
+export function parse(str) {
 	return (str || '').split(/^-{1,2}|,|\s+-{1,2}|\s+/).filter(Boolean);
 }
 
 // @see https://stackoverflow.com/a/18914855/3577474
-exports.sentences = function (str) {
+export function sentences(str) {
 	return (str || '').replace(/([.?!])\s*(?=[A-Z])/g, '$1|').split('|');
 }

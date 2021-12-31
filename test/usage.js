@@ -1,6 +1,6 @@
-const test = require('tape');
-const { join } = require('path');
-const { spawnSync } = require('child_process');
+import test from 'tape';
+import { join } from 'path';
+import { spawnSync } from 'child_process';
 
 const fixtures = join(__dirname, 'fixtures');
 
