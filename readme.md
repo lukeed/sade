@@ -1,4 +1,4 @@
-# sade [![Build Status](https://travis-ci.org/lukeed/sade.svg?branch=master)](https://travis-ci.org/lukeed/sade)
+# sade [![CI](https://github.com/lukeed/sade/workflows/CI/badge.svg)](https://github.com/lukeed/sade/actions?query=workflow%3ACI) [![licenses](https://licenses.dev/b/npm/sade)](https://licenses.dev/npm/sade)
 
 > Smooth (CLI) Operator 🎶
 
