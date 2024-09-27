@@ -37,7 +37,7 @@
   ],
   "devDependencies": {
     "esm": "3.2.25",
-    "rollup": "1.32.1",
+    "rollup": "2.79.2",
     "tap-spec": "4.1.2",
     "tape": "4.14.0",
     "terser": "4.8.0"
