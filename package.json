@@ -20,6 +20,14 @@
     "build": "rollup -c",
     "test": "tape -r esm test/*.js | tap-spec"
   },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "module-sync": "./lib/index.mjs",
+      "require": "./lib/index.js",
+      "default": "./lib/index.mjs"
+    }
+  },
   "dependencies": {
     "mri": "^1.1.0"
   },
