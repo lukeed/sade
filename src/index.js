@@ -2,6 +2,8 @@ import mri from 'mri';
 import * as $ from './utils';
 import { ALL, DEF } from './utils';
 
+let stdout = (str) => process.stdout.write(str + '\n');
+
 class Sade {
 	constructor(name, isOne) {
 		let [bin, ...rest] = name.split(/\s+/);
@@ -188,13 +190,13 @@ class Sade {
 	}
 
 	help(str) {
-		console.log(
+		stdout(
 			$.help(this.bin, this.tree, str || DEF, this.single)
 		);
 	}
 
 	_version() {
-		console.log(`${this.bin}, ${this.ver}`);
+		stdout(`${this.bin}, ${this.ver}`);
 	}
 }
 

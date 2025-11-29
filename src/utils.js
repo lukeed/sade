@@ -79,7 +79,7 @@ export function help(bin, tree, key, single) {
 export function error(bin, str, num=1) {
 	let out = section('ERROR', [str], noop);
 	out += (NL + __ + `Run \`$ ${bin} --help\` for more info.` + NL);
-	console.error(out);
+	process.stderr.write(out + '\n');
 	process.exit(num);
 }
 
