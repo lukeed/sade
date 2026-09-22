@@ -74,7 +74,7 @@ $ my-cli build --help
     Expects an `index.js` entry file.
 
   Usage
-    $ my-cli build <src> [options]
+    $ my-cli build <src> <dest> [options]
 
   Options
     -o, --output    Change the name of the output file  (default bundle.js)
@@ -93,7 +93,7 @@ $ my-cli build --help
   _Once you define a Command, you can't access the global-scope again._
 
 - **Define all commands & options in the order that you want them to appear.**<br>
-  _Sade will not mutate or sort your CLI for you. Global options print before local options._
+  _Sade will not mutate or sort your CLI for you. In command-specific help, local options print before global options._
 
 - **Required arguments without values will error & exit**<br>
   _An `Insufficient arguments!` error will be displayed along with a help prompt._
