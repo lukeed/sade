@@ -41,17 +41,17 @@ export function help(bin, tree, key, single) {
 	let out='', cmd=tree[key], pfx=`$ ${bin}`, all=tree[ALL];
 	let prefix = s => `${pfx} ${s}`.replace(/\s+/g, ' ');
 
-	// update ALL & CMD options
+	// combine display options without changing command registrations
 	let tail = [['-h, --help', 'Displays this message']];
 	if (key === DEF) tail.unshift(['-v, --version', 'Displays current version']);
-	cmd.options = (cmd.options || []).concat(all.options, tail);
+	let options = (cmd.options || []).concat(all.options, tail);
 
 	// write options placeholder
-	if (cmd.options.length > 0) cmd.usage += ' [options]';
+	let usage = cmd.usage + (options.length > 0 ? ' [options]' : '');
 
 	// description ~> text only; usage ~> prefixed
 	out += section('Description', cmd.describe, noop);
-	out += section('Usage', [cmd.usage], prefix);
+	out += section('Usage', [usage], prefix);
 
 	if (!single && key === DEF) {
 		let key, rgx=/^__/, help='', cmds=[];
@@ -70,7 +70,7 @@ export function help(bin, tree, key, single) {
 		out += section('Aliases', cmd.alibi, prefix);
 	}
 
-	out += section('Options', format(cmd.options), noop);
+	out += section('Options', format(options), noop);
 	out += section('Examples', cmd.examples.map(prefix), noop);
 
 	return out;

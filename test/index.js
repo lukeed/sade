@@ -341,3 +341,23 @@ test('prog.parse :: lazy :: single', t => {
 
 	bar.handler.apply(null, bar.args); // manual bcuz lazy; +2 tests
 });
+
+test('prog.help :: repeatable global and command output', t => {
+	let ctx = sade('bin').option('--global', 'global option').command('build <src>').option('--local', 'local option');
+	let output = [], log = console.log;
+	console.log = text => output.push(text);
+	try {
+		ctx.help('build');
+		ctx.help();
+		ctx.help('build');
+		ctx.help();
+	} finally {
+		console.log = log;
+	}
+	t.is(output[2], output[0], 'command help does not accumulate flags or usage suffixes');
+	t.is(output[3], output[1], 'global help does not accumulate flags or usage suffixes');
+	t.is((output[2].match(/\[options\]/g) || []).length, 1, 'command usage contains one options suffix');
+	t.is((output[2].match(/--global/g) || []).length, 1, 'global option is displayed once');
+	t.is((output[2].match(/--help/g) || []).length, 1, 'help option is displayed once');
+	t.end();
+});
