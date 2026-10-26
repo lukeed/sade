@@ -177,8 +177,8 @@ class Sade {
 
     const all = this.tree[ALL];
     // merge all objects :: params > command > all
-    opts.alias = Object.assign(all.alias, cmd.alias, opts.alias);
-    opts.default = Object.assign(all.default, cmd.default, opts.default);
+    opts.alias = Object.assign({}, all.alias, cmd.alias, opts.alias);
+    opts.default = Object.assign({}, all.default, cmd.default, opts.default);
 
     tmp = name.split(" ");
     idx = arr.indexOf(tmp[0], 2);

@@ -341,3 +341,36 @@ test('prog.parse :: lazy :: single', t => {
 
 	bar.handler.apply(null, bar.args); // manual bcuz lazy; +2 tests
 });
+
+
+test('prog.parse :: command options stay local', t => {
+	let ctx = sade('foo')
+		.option('--mode', 'Global mode', 'global')
+		.command('build').option('-o, --output', 'Output', 'dist').action(() => {})
+		.command('serve').action(() => {});
+
+	let build = ctx.parse(['', '', 'build'], { lazy:true });
+	t.is(build.args[0].output, 'dist', 'uses the command default');
+	t.is(build.args[0].o, 'dist', 'uses the command alias');
+
+	let serve = ctx.parse(['', '', 'serve', '-o', 'public'], { lazy:true });
+	t.same(serve.args, [{ _:[], o:'public', mode:'global' }], 'does not inherit another command alias or default');
+
+	ctx.parse(['', '', 'serve'], { lazy:true, default:{ mode:'temporary' }, alias:{ m:'mode' } });
+	serve = ctx.parse(['', '', 'serve', '-m', 'local'], { lazy:true });
+	t.same(serve.args, [{ _:[], m:'local', mode:'global' }], 'does not retain per-call defaults or aliases');
+	t.end();
+});
+
+
+test('prog.parse :: reusable short aliases', t => {
+	let ctx = sade('foo')
+		.option('-g, --global')
+		.command('build').option('-o, --output').action(() => {});
+	for (let value of ['first', 'second']) {
+		let result = ctx.parse(['', '', 'build', '-g', value, '-o', value], { lazy:true });
+		t.is(result.args[0].global, value, 'retains global alias');
+		t.is(result.args[0].output, value, 'retains command alias');
+	}
+	t.end();
+});

@@ -157,8 +157,12 @@ class Sade {
 
 		let all = this.tree[ALL];
 		// merge all objects :: params > command > all
-		opts.alias = Object.assign(all.alias, cmd.alias, opts.alias);
-		opts.default = Object.assign(all.default, cmd.default, opts.default);
+		opts.alias = Object.assign({}, all.alias, cmd.alias, opts.alias);
+		opts.default = Object.assign({}, all.default, cmd.default, opts.default);
+		// mri consumes alias arrays while populating the result.
+		for (let key in opts.alias) {
+			if (Array.isArray(opts.alias[key])) opts.alias[key] = opts.alias[key].slice();
+		}
 
 		tmp = name.split(' ');
 		idx = arr.indexOf(tmp[0], 2);
