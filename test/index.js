@@ -341,3 +341,40 @@ test('prog.parse :: lazy :: single', t => {
 
 	bar.handler.apply(null, bar.args); // manual bcuz lazy; +2 tests
 });
+
+test('prog.action (arguments past double-dash)', t => {
+	t.plan(8);
+
+	let ran1 = false;
+	sade('prog')
+		.command('build [config]')
+		.action((config, opts) => {
+			ran1 = true;
+			t.is(config, void 0, '~> optional arg is undefined when only passed after --');
+			t.same(opts._, ['abc', 'xyz'], '~> arguments after -- are preserved in opts._');
+		})
+		.parse(['node', 'cli.js', 'build', '--', 'abc', 'xyz']);
+	t.ok(ran1, '~> command action was invoked');
+
+	let ran2 = false;
+	sade('prog')
+		.command('build [config]')
+		.action((config, opts) => {
+			ran2 = true;
+			t.is(config, 'myconf', '~> optional arg before -- is captured');
+			t.same(opts._, ['abc', 'xyz'], '~> arguments after -- remain in opts._');
+		})
+		.parse(['node', 'cli.js', 'build', 'myconf', '--', 'abc', 'xyz']);
+	t.ok(ran2, '~> command action was invoked');
+
+	let ran3 = false;
+	sade('prog')
+		.command('deploy <env> [config]')
+		.action((env, config, opts) => {
+			ran3 = true;
+			t.is(env, 'prod', '~> required arg before -- is captured');
+		})
+		.parse(['node', 'cli.js', 'deploy', 'prod', '--', 'extra']);
+	t.ok(ran3, '~> command action was invoked');
+});
+

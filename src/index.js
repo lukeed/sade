@@ -164,22 +164,29 @@ class Sade {
 		idx = arr.indexOf(tmp[0], 2);
 		if (!!~idx) arr.splice(idx, tmp.length);
 
-		let vals = mri(arr.slice(offset), opts);
-		if (!vals || typeof vals === 'string') {
+		let raw = arr.slice(offset);
+		let vals = mri(raw, opts);
+		if (!vals || typeof vals === 'string') {
 			return $.error(bin, vals || 'Parsed unknown option flag(s)!');
 		}
 
+		let dd = raw.indexOf('--');
+		let post = ~dd ? raw.length - 1 - dd : 0;
+		let pre = vals._.length - post;
+
 		let segs = cmd.usage.split(/\s+/);
 		let reqs = segs.filter(x => x.charAt(0)==='<');
-		let args = vals._.splice(0, reqs.length);
 
-		if (args.length < reqs.length) {
+		if (pre < reqs.length) {
 			if (name) bin += ` ${name}`; // for help text
 			return $.error(bin, 'Insufficient arguments!');
 		}
 
+		let args = vals._.splice(0, reqs.length);
+		pre -= reqs.length;
+
 		segs.filter(x => x.charAt(0)==='[').forEach(_ => {
-			args.push(vals._.shift()); // adds `undefined` per [slot] if no more
+			args.push(pre > 0 ? (pre--, vals._.shift()) : void 0); // adds `undefined` per [slot] if no more
 		});
 
 		args.push(vals); // flags & co are last
