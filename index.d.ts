@@ -31,6 +31,7 @@ declare namespace sade {
 
 		version(value: string): Sade;
 		help(cmd?: string): void;
+		error(message: string, code?: number): void;
 	}
 }
 

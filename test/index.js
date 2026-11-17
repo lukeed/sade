@@ -36,6 +36,12 @@ test('prog.version (global)', t => {
 	t.end();
 });
 
+test('prog.error', t => {
+	let ctx = sade('foo');
+	t.is(typeof ctx.error, 'function', 'exposes an `error` method');
+	t.end();
+});
+
 test('prog.option (global)', t => {
 	let ctx = sade('foo');
 	t.is(ctx.tree.__all__.options.length, 0, 'no global options (default)');

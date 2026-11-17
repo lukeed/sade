@@ -16,6 +16,18 @@ test('(usage) basic', t => {
 	t.end();
 });
 
+test('(usage) error :: prog.error', t => {
+	let pid = exec('error.js');
+	t.is(pid.status, 1, 'exits with error code');
+	t.is(
+		pid.stderr.toString(),
+		'\n  ERROR\n    something is wrong\n\n  Run `$ bin --help` for more info.\n\n',
+		'~> stderr has "something is wrong" error message'
+	);
+	t.is(pid.stdout.length, 0, '~> stdout is empty');
+	t.end();
+});
+
 test('(usage) basic :: error :: missing command', t => {
 	let pid = exec('basic.js');
 	t.is(pid.status, 1, 'exits with error code');
