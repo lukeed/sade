@@ -667,6 +667,24 @@ Default: `null`
 The name of the command for which to display help. Otherwise displays the general help.
 
 
+### prog.error(str)
+
+Manually display an error message in sade's error format and exit the process. Useful for your own application-specific validations — for example, when two options conflict with each other — since sade can only validate its own options.
+
+> **Note:** This prints the same `ERROR` block that sade prints for its own errors, and exits with code `1` by default.
+
+#### str
+Type: `String`
+
+The error message to display.
+
+#### code
+Type: `Number`<br>
+Default: `1`
+
+The exit code to exit the process with.
+
+
 ## License
 
 MIT © [Luke Edwards](https://lukeed.com)

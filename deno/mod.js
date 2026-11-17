@@ -213,6 +213,10 @@ class Sade {
     );
   }
 
+  error(str, num) {
+    $.error(this.bin, str, num);
+  }
+
   _version() {
     console.log(`${this.bin}, ${this.ver}`);
   }
